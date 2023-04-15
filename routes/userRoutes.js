@@ -15,7 +15,7 @@ router.get("/all", async (req, res) => {
   }
 });
 
-//Write a query to find all the users who are older than 60 years of age.
+// Write a query to find all the users who live in state "State 5".
 
 //
 router.get("/test", async (req, res) => {
@@ -25,7 +25,7 @@ router.get("/test", async (req, res) => {
     let filterUser = [];
     //
     allUsers.map(function (user) {
-      if (user.age > 60) {
+      if (user.address.state === "State 7") {
         filterUser.push(user);
       }
     });
