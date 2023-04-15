@@ -21,31 +21,28 @@ router.get("/test", async (req, res) => {
   try {
     const allUsers = await User.find().lean();
     //
-    let filterUser = [];
+    let filteredUsers = [];
     //
-    allUsers.map(function (user) {
+    allUsers.forEach((user) => {
       //
       if (user.address.state === "State 7") {
         //"State 7"--if statement ta deoa-- just data kom dekhar jonno
-        for (let index = 0; index < user.grades.length; index++) {
+        user.grades.forEach((grade) => {
           //
-          if (
-            user.grades[index].subject === "Subject 1" &&
-            user.grades[index].score >= 90
-          ) {
-            // console.log(user.grades[index].score);
+          if (grade.subject === "Subject 1" && grade.score >= 90) {
+            // console.log(grade.score);
             //
-            console.log(user.grades[index]);
+            console.log(grade);
             //
-            filterUser.push(user);
+            filteredUsers.push(user);
           }
-        }
+        });
       }
     });
     //
-    console.log(filterUser);
+    console.log(filteredUsers);
     //
-    res.send(filterUser);
+    res.send(filteredUsers);
   } catch (error) {
     res.status(500).send(error);
   }
