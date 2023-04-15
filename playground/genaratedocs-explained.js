@@ -40,11 +40,14 @@ function generateDocs(numDocs) {
 ////////////
 
 // //
-// const docs = generateDocs(200);
-// User.insertMany(docs)
-//   .then(() => console.log("Documents inserted successfully"))
-//   .catch((err) => console.error("Error inserting documents", err));
+//calling the function
+//
+const docs = generateDocs(200);
+User.insertMany(docs)
+  .then(() => console.log("Documents inserted successfully"))
+  .catch((err) => console.error("Error inserting documents", err));
 //////////////////////////////////////////////////////////////////////////////////////////////////
+
 // FAQ
 
 //Q-so how many subjects each has, is the number of subjects constant or random?

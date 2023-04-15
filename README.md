@@ -1,51 +1,14 @@
 # object-array-logic-practice-with-mongodb
 
-// Define a function called generateDocs that takes a number parameter
-function generateDocs(numDocs) {
-// Create an empty array called docs to hold the generated documents
-const docs = [];
-// Use a loop to generate the desired number of documents
-for (let i = 0; i < numDocs; i++) {
-// Create an object called doc for the current document being generated
-const doc = {
-// Add a property to doc called name, which is a string value representing the name of the person
-name: `Person ${i + 1}`,
-// Add a property to doc called age, which is a random integer between 20 and 69
-age: Math.floor(Math.random() _ 50) + 20,
-// Add a property to doc called address, which is an object containing the street address, city, state, and ZIP code
-address: {
-street: `Street ${i + 1}`,
-city: `City ${i + 1}`,
-state: `State ${i + 1}`,
-zip: `${Math.floor(Math.random() _ 90000) + 10000}`,
-      },
-      // Add a property to doc called grades, which is an empty array
-      grades: [],
-    };
-    // Use another loop to generate 5 grades for the current document
-    for (let j = 0; j < 5; j++) {
-      // Create an object representing the current grade, with a subject and score
-      const grade = {
-        subject: `Subject ${j + 1}`,
-score: Math.floor(Math.random() \* 101),
-};
-// Add the grade object to the grades array for the current document
-doc.grades.push(grade);
-}
-// Add the completed document object to the docs array
-docs.push(doc);
-}
-// Return the array of generated documents
-return docs;
-}
+////////
+//This file is acctualty created and used in model/user.js
 
-////////////
+//This file is aslo saved in playground/genaratedocs-explained.js
 
-// //
-// const docs = generateDocs(200);
-// User.insertMany(docs)
-// .then(() => console.log("Documents inserted successfully"))
-// .catch((err) => console.error("Error inserting documents", err));
+![image](https://user-images.githubusercontent.com/118996650/232236861-c85d8905-ed89-47fa-8ee4-1c59ae05bf63.png)
+
+![image](https://user-images.githubusercontent.com/118996650/232237117-f3b5e568-33c7-4af9-91f8-55fe263c1e64.png)
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // FAQ
 
