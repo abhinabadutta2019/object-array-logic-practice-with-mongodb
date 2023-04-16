@@ -15,19 +15,11 @@ router.get("/all", async (req, res) => {
   }
 });
 
-//$elemMatch is a MongoDB query operator that allows you to match documents that contain an array of values that match specific criteria. In other words, it allows you to find documents where one or more elements of an array match the specified condition(s). It is used when you want to match an array of values with multiple conditions, as it returns only the first matching element.
-
 //
-router.get("/ageAndScore", async (req, res) => {
+router.get("/zip", async (req, res) => {
   try {
     const result = await User.find({
-      age: { $gt: 50 },
-      grades: {
-        $elemMatch: {
-          subject: "Subject 1",
-          score: { $gt: 90 },
-        },
-      },
+      "address.zip": { $gt: 70000, $lt: 80000 },
     });
 
     res.send(result);
@@ -37,34 +29,21 @@ router.get("/ageAndScore", async (req, res) => {
 });
 
 //
-// Write a query to retrieve all documents where the score in subject 1 is greater than 90.
+// Write a query to retrieve all documents where the zip code starts with "7".
 //
 router.get("/test", async (req, res) => {
   try {
     const allUsers = await User.find().lean();
     //
-    let filteredUsers = [];
+    filterArray = [];
     //
-    allUsers.forEach((user) => {
-      //
-      if (user.age > 50) {
-        //"State 7"--if statement ta deoa-- just data kom dekhar jonno
-        user.grades.forEach((grade) => {
-          //
-          if (grade.subject === "Subject 1" && grade.score >= 90) {
-            // console.log(grade.score);
-            //
-            console.log(grade);
-            //
-            filteredUsers.push(user);
-          }
-        });
+    allUsers.map(function (user) {
+      if (user.address.zip[0] === "7") {
+        filterArray.push(user);
       }
     });
     //
-    console.log(filteredUsers);
-    //
-    res.send(filteredUsers);
+    res.send(filterArray);
   } catch (error) {
     res.status(500).send(error);
   }
