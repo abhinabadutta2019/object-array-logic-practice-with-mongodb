@@ -16,10 +16,15 @@ router.get("/all", async (req, res) => {
 });
 
 //
-router.get("/zip", async (req, res) => {
+router.get("/mongo", async (req, res) => {
   try {
     const result = await User.find({
-      "address.zip": { $gt: 70000, $lt: 80000 },
+      grades: {
+        $elemMatch: {
+          subject: "Subject 2",
+          score: { $lte: 50 },
+        },
+      },
     });
 
     res.send(result);
@@ -29,7 +34,7 @@ router.get("/zip", async (req, res) => {
 });
 
 //
-// Write a query to retrieve all documents where the zip code starts with "7".
+// Write a query to retrieve all documents where the score in subject 2 is less than or equal to 50.
 //
 router.get("/test", async (req, res) => {
   try {
@@ -37,12 +42,13 @@ router.get("/test", async (req, res) => {
     //
     filterArray = [];
     //
+
     allUsers.map(function (user) {
-      if (user.address.zip[0] === "7") {
+      if (user.grades[1].score <= 50) {
         filterArray.push(user);
       }
     });
-    //
+
     res.send(filterArray);
   } catch (error) {
     res.status(500).send(error);
