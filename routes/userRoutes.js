@@ -15,183 +15,236 @@ router.get("/all", async (req, res) => {
   }
 });
 
-//
+////age grater than 67
 
-//Find all students who have a score greater than or equal to 50 in "Subject 4" and a score less than or equal to 20 in "Subject 5".
 router.get("/test1", async (req, res) => {
-  try {
-    const students = await User.find({
-      grades: {
-        $elemMatch: { subject: "Subject 4", score: { $gte: 50 } },
-        $elemMatch: { subject: "Subject 5", score: { $lte: 20 } },
-      },
-    });
-    res.status(200).json(students);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-//Find all users who have at least one grade with Subject 4 greater than or equal to 90.
-
-router.get("/test2", async (req, res) => {
-  try {
-    const users = await User.find({
-      grades: {
-        $elemMatch: { subject: "Subject 4", score: { $gte: 90 } },
-      },
-    });
-    res.status(200).json(users);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-//Find all users who have a grade with a score greater than or equal to 90 in "Subject 3" and a score less than or equal to 10 in "Subject 5".
-router.get("/test3", async (req, res) => {
-  try {
-    const users = await User.find({
-      grades: {
-        $elemMatch: {
-          subject: "Subject 3",
-          score: { $gte: 90 },
-        },
-      },
-      grades: {
-        $elemMatch: {
-          subject: "Subject 5",
-          score: { $lte: 10 },
-        },
-      },
-    });
-    res.json(users);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-//age grater than 67
-router.get("/test4", async (req, res) => {
   try {
     const users = await User.find({ age: { $gt: 67 } });
     res.send(users);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server error");
+  } catch (e) {
+    res.send(e);
   }
 });
 
-//Write a query to retrieve all documents where the average score in all subjects is greater than 75.
+//age grater than & equal-to 67
+router.get("/test2", async (req, res) => {
+  try {
+    const users = await User.find({ age: { $gte: 67 } });
+    res.send(users);
+  } catch (e) {
+    res.send(e);
+  }
+});
+
+//age less than & equal-to 21
+
+router.get("/test3", async (req, res) => {
+  try {
+    const users = await User.find({ age: { $lte: 21 } });
+    res.send(users);
+  } catch (e) {
+    res.send(e);
+  }
+});
+
+//age is less than 25 and greater than 22
+router.get("/test4", async (req, res) => {
+  try {
+    const users = await User.find({ age: { $gt: 22, $lt: 25 } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+//question--- age is  27
 router.get("/test5", async (req, res) => {
   try {
-    const result = await User.find({
-      $expr: {
-        $gt: [
-          {
-            $avg: "$grades.score",
-          },
-          75,
-        ],
-      },
-    });
-    res.json(result);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server error");
+    const users = await User.find({ age: 27 });
+    res.send(users);
+  } catch (e) {
+    res.send(e);
   }
 });
 
-//How to retrieve all documents where the state is "State 1"?
+////////////////////////////////////
+//regex
+/////////////////////////////
+//question-- name ends with 9
+router.get("/test6", async (req, res) => {
+  try {
+    const users = await User.find({ name: { $regex: /9$/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+//question-- name ends with 10
 router.get("/test7", async (req, res) => {
   try {
-    const documents = await User.find({ "address.state": "State 1" });
-    res.send(documents);
-  } catch (error) {
-    console.error(error);
+    const users = await User.find({ name: { $regex: /10$/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
     res.status(500).send("Server Error");
   }
 });
 
-//Write a query to find all the users who have a total score greater than 390 across all subjects.
-
+//question-- second last item in name string is 2
 router.get("/test8", async (req, res) => {
   try {
-    const documents = await User.find({
-      $expr: {
-        $gt: [{ $sum: "$grades.score" }, 390],
-      },
-    });
-    res.send(documents);
-  } catch (error) {
-    console.error(error);
+    const users = await User.find({ name: { $regex: /.2.$/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
     res.status(500).send("Server Error");
   }
 });
 
-//find all where state is 3 and zip starts with 7
-
+//question-- name starts with P
 router.get("/test9", async (req, res) => {
   try {
-    const documents = await User.find({
-      "address.state": "State 3",
-      "address.zip": /^7/,
-    });
-    res.send(documents);
-  } catch (error) {
-    console.error(error);
+    const users = await User.find({ name: { $regex: /^P/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
     res.status(500).send("Server Error");
   }
 });
 
-//find all where state is 3 and zip starts with from 5 to 7
+//question-- second item in name string is e
 
 router.get("/test10", async (req, res) => {
   try {
-    const documents = await User.find({
-      "address.state": "State 3",
-      "address.zip": { $regex: "^[5-7]" },
-    });
-    res.send(documents);
-  } catch (error) {
-    console.error(error);
+    const users = await User.find({ name: { $regex: /^.e/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
     res.status(500).send("Server Error");
   }
 });
 
-//find all where state is 3  or 5 and zip starts with from 5 to 7
+//question-- third item in name string is r
 router.get("/test11", async (req, res) => {
   try {
-    const documents = await User.find({
-      $and: [
-        {
-          $or: [{ "address.state": "State 3" }, { "address.state": "State 5" }],
-        },
-        { "address.zip": { $regex: "^[5-7]" } },
-      ],
-    });
-    res.send(documents);
-  } catch (error) {
-    console.error(error);
+    const users = await User.find({ name: /^.{2}r/ });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
     res.status(500).send("Server Error");
   }
 });
 
-//
+//question-- name starts with Per
 router.get("/test12", async (req, res) => {
   try {
-    const documents = await User.find({
-      $or: [{ "address.state": "State 3" }, { "address.state": "State 5" }],
-      "address.zip": { $regex: "^(3|5)" },
-    });
-    res.send(documents);
-  } catch (error) {
-    console.error(error);
+    const users = await User.find({ name: { $regex: /^Per/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+//question --- 3rd last in name string is '2'
+router.get("/test13", async (req, res) => {
+  try {
+    const users = await User.find({ name: { $regex: /.2..$/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
     res.status(500).send("Server Error");
   }
 });
 
 //
+/////////////////////////////////////////////////////////////////
+//regex with zip
+////////////////////////////////////////////////////////////////
+//question-- zip starts with 5
+router.get("/reg1", async (req, res) => {
+  try {
+    const users = await User.find({ "address.zip": { $regex: /^5/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+//question-- zip starts with 157
+router.get("/reg2", async (req, res) => {
+  try {
+    const users = await User.find({ "address.zip": { $regex: /^157/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+//question-- zip ends with 719
+router.get("/reg4", async (req, res) => {
+  try {
+    const users = await User.find({ "address.zip": { $regex: /719$/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+//second last item
+
+router.get("/reg5", async (req, res) => {
+  try {
+    //question --- 3rd last in name string is '2'
+    // const users = await User.find({ "address.zip": { $regex: /.2..$/ } });
+    //2nd last 1, 4th last 5, 5th last 1
+    const users = await User.find({ "address.zip": { $regex: /15.1.$/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+//start theke 2nd position e 5 , 3rd e 7
+router.get("/reg6", async (req, res) => {
+  try {
+    //second item is 5, 3rd is 7
+    const users = await User.find({ "address.zip": { $regex: /^.57./ } });
+    //eta deleo uporertar moto same result e asche
+    // const users = await User.find({ "address.zip": { $regex: /^.57/ } });
+    // from the start 2nd position is 5m 4th position is 1
+    // const users = await User.find({ "address.zip": { $regex: /^.5.1/ } });
+    //second item is 1
+    // const users = await User.find({ "address.zip": { $regex: /^.{2}1/ } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+/////////////////////////////////////////
+//regex case sensetive noi
+/////////////////////////////////////////
+//name starts with capital P or small p--- i -- makes it case insensative
+router.get("/case1", async (req, res) => {
+  try {
+    //name starts with capital P or small p--- i -- makes it case insensative
+    // const users = await User.find({ name: { $regex: /^p/i } });
+    //
+    const users = await User.find({ name: { $regex: /^p/i } });
+    res.send(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
 module.exports = router;
