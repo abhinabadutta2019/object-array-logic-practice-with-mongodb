@@ -15,24 +15,49 @@ router.get("/all", async (req, res) => {
   }
 });
 
-/////////////////////////////////////////////////
-//$elemMatch example
-////////////////////////////////////////////////
-//score in subject 1 grater than 90,- with $elemMatch
-//grades: { $elemMatch: { subject: "Subject 1", score: { $gt: 90 } } },
+//find user if age is more than 67 and state is 3
+router.get("/test1", async (req, res) => {
+  try {
+    const users = await User.find({
+      age: { $gt: 67 },
+      "address.state": "State 3",
+    });
+    res.send(users);
+  } catch (e) {
+    res.send(e);
+  }
+});
+//find user if age is more than 67 and state is 3 and score in subject 1 is more than 35
+router.get("/test2", async (req, res) => {
+  try {
+    const users = await User.find({
+      $and: [
+        { age: { $gt: 27 } },
+        { "address.state": "State 3" },
+        {
+          grades: { $elemMatch: { subject: "Subject 1", score: { $gt: 35 } } },
+        },
+      ],
+    });
+    res.send(users);
+  } catch (e) {
+    res.send(e);
+  }
+});
 
-//score in subject 1 grater than 90, less than & equal to 93
-// grades: {
-//   $elemMatch: { subject: "Subject 1", score: { $gt: 90, $lte: 93 } },
-// },
-////score in subject 1 is exactly- 93
-// grades: { $elemMatch: { subject: "Subject 1", score: 93 } },
+//find user if state is 3, Subject 1 score grater than 55 and subject 2 score grater than 50
 router.get("/test3", async (req, res) => {
   try {
     const users = await User.find({
-      grades: {
-        $elemMatch: { subject: "Subject 1", score: { $gt: 90, $lte: 93 } },
-      },
+      $and: [
+        { "address.state": "State 3" },
+        {
+          grades: { $elemMatch: { subject: "Subject 1", score: { $gt: 55 } } },
+        },
+        {
+          grades: { $elemMatch: { subject: "Subject 2", score: { $gt: 50 } } },
+        },
+      ],
     });
     res.send(users);
   } catch (e) {
@@ -40,41 +65,25 @@ router.get("/test3", async (req, res) => {
   }
 });
 
-//score in Subject 1 and Subject 2 is more than 85, you can use the $and operator to combine two $elemMatch expressions like this
-//
-// {
-//   $and: [
-//     {
-//       grades: { $elemMatch: { subject: "Subject 1", score: { $gt: 85 } } },
-//     },
-//     {
-//       grades: { $elemMatch: { subject: "Subject 2", score: { $gt: 85 } } },
-//     },
-//   ],
-// }
-
-//score in subject 1 is exactly 85 and score in subject 2 is grater than 85
-// {
-//   $and: [
-//     {
-//       grades: { $elemMatch: { subject: "Subject 1", score: 85 } },
-//     },
-//     {
-//       grades: { $elemMatch: { subject: "Subject 2", score: { $gt: 85 } } },
-//     },
-//   ],
-// }
-//
+//2. find user if state is 3, Subject 1 score less than 11 OR subject 2 score grater than 90
 router.get("/test4", async (req, res) => {
   try {
     const users = await User.find({
-      //score in subject 1 is exactly 85 and score in subject 2 is grater than 85
       $and: [
+        { "address.state": "State 3" },
         {
-          grades: { $elemMatch: { subject: "Subject 1", score: 85 } },
-        },
-        {
-          grades: { $elemMatch: { subject: "Subject 2", score: { $gt: 85 } } },
+          $or: [
+            {
+              grades: {
+                $elemMatch: { subject: "Subject 1", score: { $lt: 11 } },
+              },
+            },
+            {
+              grades: {
+                $elemMatch: { subject: "Subject 2", score: { $gt: 90 } },
+              },
+            },
+          ],
         },
       ],
     });
@@ -84,18 +93,11 @@ router.get("/test4", async (req, res) => {
   }
 });
 
-//This will return all users who have a grade in either Subject 1 or Subject 2 with a score greater than 95
+//To find a user if the state is 3 and the score in any subject is less than 10, we can use the following query:
 router.get("/test5", async (req, res) => {
   try {
     const users = await User.find({
-      $or: [
-        {
-          grades: { $elemMatch: { subject: "Subject 1", score: { $gt: 95 } } },
-        },
-        {
-          grades: { $elemMatch: { subject: "Subject 2", score: { $gt: 95 } } },
-        },
-      ],
+      $and: [{ "address.state": "State 3" }, { "grades.score": { $lt: 3 } }],
     });
     res.send(users);
   } catch (e) {
@@ -103,60 +105,16 @@ router.get("/test5", async (req, res) => {
   }
 });
 
-//combined score of all subject is less than 100
-
-//{
-//   $expr: {
-//     $lt: [{ $sum: "$grades.score" }, 100],
-//   },
-// }
-
-//combined score of all subject is grater than and equal to  370
-// {
-//   $expr: {
-//     $gt: [{ $sum: "$grades.score" }, 370],
-//   },
-// }
-
+//To find a user if the state is 33( acctuly no state 33) or the score in any subject is grater than 99
 router.get("/test6", async (req, res) => {
   try {
     const users = await User.find({
-      $expr: {
-        $gt: [{ $sum: "$grades.score" }, 370],
-      },
+      $or: [{ "address.state": "State 33" }, { "grades.score": { $gt: 99 } }],
     });
     res.send(users);
   } catch (e) {
     res.send(e);
   }
 });
-
-//find all users whose avarage of all subject is grater than 75
-router.get("/test7", async (req, res) => {
-  try {
-    const users = await User.aggregate([
-      {
-        $project: {
-          _id: 1,
-          name: 1,
-          grades: 1,
-          average: { $avg: "$grades.score" },
-        },
-      },
-      {
-        $match: {
-          average: { $gt: 75 },
-        },
-      },
-    ]);
-    res.send(users);
-  } catch (e) {
-    res.send(e);
-  }
-});
-//
-
-//
-
 //
 module.exports = router;
