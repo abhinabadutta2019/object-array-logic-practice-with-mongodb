@@ -25,22 +25,17 @@ router.get("/test", async (req, res) => {
   }
 });
 
-// first metch then group example
+// c. Get the count of persons living in each city, and sort the results by the city name in ascending order:
 router.get("/test1", async (req, res) => {
   try {
     const allUsers = await User.aggregate([
-      { $match: { age: 48 } },
-      { $group: { _id: "$address.state", total: { $sum: 1 } } },
+      {
+        $group: {
+          _id: "$address.city",
+          count: { $sum: 1 },
+        },
+      },
     ]);
-    //age wise match kore -sei age e kotojon ache
-    // await User.aggregate([
-    //   { $match: { age: { $gt: 24, $lt: 30 } } },
-    //   { $group: { _id: "$age", total: { $sum: 1 } } },
-    // ]);
-    // await User.aggregate([
-    //   { $match: { age: 48 } },
-    //   { $group: { _id: "$address.state", total: { $sum: 1 } } },
-    // ]);
 
     res.send(allUsers);
   } catch (error) {
@@ -49,63 +44,117 @@ router.get("/test1", async (req, res) => {
 });
 
 //
+// a. Get the highest score for each subject, across all persons, and sort the results by the highest score in descending order:
+// {
+//   $unwind: "$grades",
+// },
+// {
+//   $group: {
+//     _id: "$grades.subject",
+//     getHighest: { $max: "$grades.score" },
+//   },
+// },
+
+//
+//To group by state and find the highest score for each subject:
+//  {
+//   $unwind: "$grades",
+// },
+// {
+//   $group: {
+//     _id: { state: "$address.state", subject: "$grades.subject" },
+//     getmax: { $max: "$grades.score" },
+//   },
+// },
+// {
+//   $group: {
+//     _id: "$_id.state",
+//     subjects: { $push: { subject: "$_id.subject", getmax: "$getmax" } },
+//   },
+// },
+//
+//  //To group by state and find the average age of people in each state:
+//     // { $unwind: "$address" },
+//     {
+//       $group: {
+//         _id: "$address.state",
+//         avarageAge: { $avg: "$age" },
+//       },
+//     },
+
+//c. Get the top 3 scores for each person:
+// {
+//   $project: {
+//     name: 1,
+//     _id: 1,
+//     grades: { $slice: ["$grades", 3] },
+//   },
+// },
+//// Get the average score for each subject across all persons:
+// { $unwind: "$grades" },
+// {
+//   $group: {
+//     _id: "$grades.subject",
+//     total: { $avg: "$grades.score" },
+//   },
+// },
+// // a. Get the total number of grades for each person:
+// {
+//   $unwind: "$grades",
+// },
+// { $count: "grades" },
+//
+//Get the highest score for each subject:
+// {
+//   $unwind: "$grades",
+// },
+// {
+//   $group: {
+//     _id: "$grades.subject",
+//     highestScore: {
+//       $max: "$grades.score",
+//     },
+//   },
+// },
+///// Filter documents by score greater than 90 and get the total count
+//this correct- wrong my try-below
+// { $unwind: "$grades" },
+// {
+//   $match: {
+//     "grades.score": { $gt: 90 },
+//   },
+// },
+// {
+//   $count: "total",
+// },
+
+//wrong answer by me--although giving different result-Filter documents by score greater than 90 and get the total count:
+//  {
+//   $match: {
+//     "grades.score": { $gt: 90 },
+//   },
+// },
+// {
+//   $group: { _id: "$age", total: { $sum: 1 } },
+// },
+
+//Group documents by city and get the average age:
+// {
+//   $group: {
+//     _id: "$address.state",
+//     avgAge: { $avg: "$age" },
+//   },
+// },
+// //tar por sort by avgAge
+// {
+//   $sort: {
+//     avgAge: 1,
+//   },
+// },
+//
 router.get("/test2", async (req, res) => {
   try {
-    const allUsers = await User.aggregate([
-      //$unwind: Unwind an array field and create a new document for each element in the array
-      // Example: Unwind the "grades" array and get a separate document for each grade, then match for subject 1
-
-      {
-        $unwind: "$grades",
-      },
-      {
-        $match: {
-          "grades.subject": "Subject 1",
-        },
-      },
-
-      //
-      //$limit: Limit the number of documents returned in the result set
-      // Example: Get only the first two documents from the collection
-      // {
-      //   $match: {
-      //     "address.state": "State 14",
-      //   },
-      // },
-      // {
-      //   $limit: 2,
-      // },
-      // $project: Select specific fields from documents and rename them if necessary
-      // Example: Select only the "name" and "address.city" fields, and rename "address.city" to "city"
-      //
-      // {
-      //   $project: {
-      //     _id: 0,
-      //     name: 1,
-      //     city: "$address.city",
-      //   },
-      // },
-      //// Example: Sort documents by "age" field in descending order
-      // {
-      //   $sort: {
-      //     age: -1,
-      //   },
-      // },
-      //// Example: Group documents by "address.city" field and get the total count of documents in each city
-      // {
-      //   $group: {
-      //     _id: "$address.city",
-      //     count: { $sum: 1 },
-      //   },
-      // },
-      ////$match: Filter documents by a specific condition
-      // Example: Get all documents where the "age" field is greater than or equal to 35, less than equal to 40
-      // {
-      //   $match: {
-      //     age: { $gte: 35, $lte: 40 },
-      //   },
-      // },
-    ]);
+    const allUsers = await User.aggregate([]);
 
     res.send(allUsers);
   } catch (error) {
