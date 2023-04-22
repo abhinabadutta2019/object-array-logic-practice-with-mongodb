@@ -18,21 +18,36 @@ router.get("/all", async (req, res) => {
 router.get("/test", async (req, res) => {
   try {
     const allUsers = await User.aggregate([
-      // What is the average score of people aged 25 or younger in "Subject 3"?
-      //my solve
+      // What is the highest score achieved by a person living in a city with a population between 3 and 6?
+      //first try to find total population in a city
+      //eta korle kon city gulo ----seta paoa jacche
       {
-        $unwind: {
-          path: "$grades",
+        $group: {
+          _id: "$address.city",
+          totalPeople: {
+            $sum: 1,
+          },
         },
       },
       {
         $match: {
-          "grades.subject": "Subject 3",
-          age: { $lte: 25 },
+          totalPeople: { $gt: 2, $lt: 7 },
         },
       },
+      //eta korle array of object e reply asche
+      // {
+      //   $project: {
+      //     _id: 0,
+      //     totalPeople: { $push: "$_id" },
+      //   },
+      // },
+      //
+      //eta korle array te reply asche
       {
-        $group: { _id: "$grades.subject", avgScore: { $avg: "$grades.score" } },
+        $group: {
+          _id: null,
+          totalPeople: { $push: "$_id" },
+        },
       },
     ]);
 
@@ -42,9 +57,10 @@ router.get("/test", async (req, res) => {
   }
 });
 
+//wrong logic
+//eta korle unwind hoye jaoa er jonno --- prottekta --- user k 5 bar kore dhorche
+
 router.get("/test1", async (req, res) => {
-  // What is the average score of people aged 25 or younger in "Subject 3"?
-  //gpt solve
   try {
     const allUsers = await User.aggregate([
       {
@@ -53,29 +69,19 @@ router.get("/test1", async (req, res) => {
         },
       },
       {
-        $match: {
-          $and: [{ "grades.subject": "Subject 3" }, { age: { $lte: 25 } }],
-        },
-      },
-      {
         $group: {
-          _id: null,
-          totalScore: {
-            $sum: "$grades.score",
-          },
-          totalStudent: {
+          _id: "$address.city",
+          totalPeople: {
             $sum: 1,
           },
         },
       },
-      {
-        $project: {
-          _id: 0,
-          avarageScore: {
-            $divide: ["$totalScore", "$totalStudent"],
-          },
-        },
-      },
+      // {
+      //   $group: {
+      //     _id: null,
+      //     totalPopulation: { $sum: "$totalPeople" },
+      //   },
+      // },
     ]);
 
     res.send(allUsers);
@@ -84,7 +90,57 @@ router.get("/test1", async (req, res) => {
   }
 });
 
-//
+//this is correct answer - 2 bar aggrigate method use kore answer elo
+router.get("/test3", async (req, res) => {
+  try {
+    const allUsers = await User.aggregate([
+      {
+        $group: {
+          _id: "$address.city",
+          totalPeople: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $match: {
+          totalPeople: { $gt: 2, $lt: 7 },
+        },
+      },
 
+      {
+        $group: {
+          _id: null,
+          totalPeople: { $push: "$_id" },
+        },
+      },
+    ]);
+    //uporer aggregation er result theke pelam
+    // extract the array of city names
+    const cityNames = allUsers[0].totalPeople;
+    //
+    const highestScore = await User.aggregate([
+      {
+        $match: {
+          "address.city": { $in: cityNames },
+        },
+      },
+      {
+        $unwind: "$grades",
+      },
+      {
+        $group: {
+          _id: "$address.city",
+          highestScore: {
+            $max: "$grades.score",
+          },
+        },
+      },
+    ]);
+    res.send(highestScore);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 //
 module.exports = router;
