@@ -18,25 +18,21 @@ router.get("/all", async (req, res) => {
 router.get("/test", async (req, res) => {
   try {
     const allUsers = await User.aggregate([
-      // Which state has the highest average score across all subjects
+      // What is the average score of people aged 25 or younger in "Subject 3"?
+      //my solve
       {
         $unwind: {
           path: "$grades",
         },
       },
       {
-        $group: {
-          _id: "$address.city",
-          getAvg: { $avg: "$grades.score" },
+        $match: {
+          "grades.subject": "Subject 3",
+          age: { $lte: 25 },
         },
       },
       {
-        $sort: {
-          getAvg: -1,
-        },
-      },
-      {
-        $limit: 1,
+        $group: { _id: "$grades.subject", avgScore: { $avg: "$grades.score" } },
       },
     ]);
 
@@ -47,19 +43,27 @@ router.get("/test", async (req, res) => {
 });
 
 router.get("/test1", async (req, res) => {
+  // What is the average score of people aged 25 or younger in "Subject 3"?
+  //gpt solve
   try {
-    // Which state has the highest average score across all subjects
     const allUsers = await User.aggregate([
       {
-        $unwind: "$grades",
+        $unwind: {
+          path: "$grades",
+        },
+      },
+      {
+        $match: {
+          $and: [{ "grades.subject": "Subject 3" }, { age: { $lte: 25 } }],
+        },
       },
       {
         $group: {
-          _id: "$address.city",
+          _id: null,
           totalScore: {
             $sum: "$grades.score",
           },
-          totalStudents: {
+          totalStudent: {
             $sum: 1,
           },
         },
@@ -67,19 +71,10 @@ router.get("/test1", async (req, res) => {
       {
         $project: {
           _id: 0,
-          state: "$_id",
-          averageScore: {
-            $divide: ["$totalScore", "$totalStudents"],
+          avarageScore: {
+            $divide: ["$totalScore", "$totalStudent"],
           },
         },
-      },
-      {
-        $sort: {
-          averageScore: -1,
-        },
-      },
-      {
-        $limit: 1,
       },
     ]);
 
