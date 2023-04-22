@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const User = require("../model/user");
 const router = express.Router();
 
-//
 router.get("/all", async (req, res) => {
   try {
     const allUsers = await User.find({});
@@ -14,69 +13,23 @@ router.get("/all", async (req, res) => {
     res.status(500).send(error);
   }
 });
-//
+
 router.get("/test", async (req, res) => {
   try {
     const allUsers = await User.aggregate([
-      // 7. How many people have a score of 20 or lower in all any of the subjects ?
-
       {
         $unwind: "$grades",
       },
-
-      {
-        $match: { "grades.score": { $lte: 20 } },
-      },
       {
         $group: {
-          _id: "$name",
-          totalScores: {
-            $sum: 1,
-          },
+          //eta constant bole -- 1ta object e result asche
+          _id: "randomID",
+          sumScores: { $sum: "$grades.score" },
+          maxScore: { $max: "$grades.score" },
+          minScores: { $min: "$grades.score" },
+          avgScore: { $avg: "$grades.score" },
         },
       },
-
-      //eta reply asche
-
-      // [
-      //   {
-      //     _id: "Person 107",
-      //     totalScores: 2,
-      //   },
-      //   {
-      //     _id: "Person 12",
-      //     totalScores: 2,
-      //   },
-      // ],
-      //^^^^^^^ this part correct-- eta mane-- joto gulo totalScores ache tar jogfol
-      // {
-      //   $group: {
-      //     _id: null,
-      //     count: { $sum: 1 },
-      //   },
-      // },
-      //
-      //
-      //^^^^^^^  uporer part ta ar eta ek e kaj korche--- jotogulo item ache -- jog korche
-      {
-        $group: {
-          _id: null,
-          count: { $count: {} },
-        },
-      },
-
-      //just testing--- jodi sobkora totalScores k jogkori
-      // {
-      //   $group: {
-      //     _id: null,
-      //     count: { $sum: "$totalScores" },
-      //   },
-      // },
-
-      //this works
-      // {
-      //   $count: "totalScores",
-      // },
     ]);
 
     res.send(allUsers);
@@ -85,53 +38,71 @@ router.get("/test", async (req, res) => {
   }
 });
 
-//process 2
+//
 router.get("/test1", async (req, res) => {
   try {
     const allUsers = await User.aggregate([
       {
         $unwind: "$grades",
       },
-
-      {
-        $match: { "grades.score": { $lte: 20 } },
-      },
       {
         $group: {
+          //eta variable bole prottekta $name variable wise result asche- $name 200 ta bole total 200 ta result asche
           _id: "$name",
-          totalScores: {
-            $sum: 1,
-          },
+          sumScores: { $sum: "$grades.score" },
+          maxScore: { $max: "$grades.score" },
+          minScores: { $min: "$grades.score" },
+          avgScore: { $avg: "$grades.score" },
         },
       },
-      //****eta kore sobkota k-- array er moddhe dhokano hocche
-      {
-        $group: {
-          _id: null,
-          totalPeople: { $push: "$_id" },
-        },
-      },
-      //*** *eta reply asche
-      //     {
-      //       "_id": null,
-      //       "totalPeople": [
-      //           "Person 71",
-      //           "Person 23",
-      //           "Person 48",
-      //           "Person 77",
-      //           "Person 1",
-      //           "Person 21"
-      //         ]
-      //     }
-      // ]
+    ]);
 
-      //****--- etar porer step
+    res.send(allUsers);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.get("/test1", async (req, res) => {
+  try {
+    const allUsers = await User.aggregate([
+      {
+        $unwind: "$grades",
+      },
       {
         $group: {
-          _id: null,
-          totalPeopleCount: {
-            $sum: { $size: "$totalPeople" },
-          },
+          //eta age wise segment kore total 48 ta result asche
+          _id: "$age",
+          sumScores: { $sum: "$grades.score" },
+          maxScore: { $max: "$grades.score" },
+          minScores: { $min: "$grades.score" },
+          avgScore: { $avg: "$grades.score" },
+        },
+      },
+    ]);
+    res.send(allUsers);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+//
+router.get("/test2", async (req, res) => {
+  try {
+    const allUsers = await User.aggregate([
+      {
+        $group: {
+          //etai array nei bole $unwind er dorkar nei
+          //eta $address.state wise segment kore total 49 ta result asche
+          _id: "$address.city",
+          // sumScores: { $sum: "$grades.score" },
+          // maxScore: { $max: "$grades.score" },
+          // minScores: { $min: "$grades.score" },
+          // avgScore: { $avg: "$grades.score" },
+          //
+          count: { $sum: 1 },
+          //count 1 kora mane --- total kota oita royeche -- ekhane- address.state
+          //eta $address.state wise segment kore total 49 ta result asche
         },
       },
     ]);
@@ -145,35 +116,38 @@ router.get("/test1", async (req, res) => {
 router.get("/test3", async (req, res) => {
   try {
     const allUsers = await User.aggregate([
-      {
-        $unwind: "$grades",
-      },
-
-      {
-        $match: { "grades.score": { $lte: 20 } },
-      },
+      // {
+      //   $unwind: "$grades",
+      // },
       {
         $group: {
-          _id: "$name",
-          totalScores: {
-            $sum: 1,
-          },
-        },
-      },
-      //used project just to test
-      {
-        $project: {
-          _id: 0,
-          totalScores: 1,
+          //eta $address.state wise segment kore total 20 ta result asche
+          _id: "$address.state",
+
+          //ei part ta etai dorkar nei
+          // sumScores: { $sum: "$grades.score" },
+          // maxScore: { $max: "$grades.score" },
+          // minScores: { $min: "$grades.score" },
+          // avgScore: { $avg: "$grades.score" },
+          //
+          counter: { $sum: 1 },
         },
       },
 
-      { $count: "totalScores" },
+      //eta korle total kota $address.state ache paoa jabe - 200 ta paoar kotha
+      //
+      // {
+      //   $group: {
+      //     _id: "randomID",
+      //     count: { $sum: "$counter" },
+      //   },
+      //
+      // },
     ]);
     res.send(allUsers);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-//
+
 module.exports = router;
