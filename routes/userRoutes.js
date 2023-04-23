@@ -13,6 +13,39 @@ router.get("/all", async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+router.get("/test2", async (req, res) => {
+  try {
+    const allUsers = await User.aggregate([
+      //unwind
+      {
+        $unwind: "$grades",
+      },
+      //match --zip that starts with -5
+      {
+        $match: { "address.zip": /^5/ },
+      },
+
+      //eta korle prottekta individual _id er -- thoseSubjects-array te dhukche
+      {
+        $group: { _id: "random", thoseSubjects: { $push: "$grades.score" } },
+      },
+      //
+      {
+        $project: {
+          result: {
+            $sortArray: { input: "$thoseSubjects", sortBy: -1 },
+          },
+        },
+      },
+    ]);
+
+    res.send(allUsers);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 //example 1
 router.get("/test", async (req, res) => {
   try {
@@ -40,24 +73,22 @@ router.get("/test1", async (req, res) => {
   try {
     const allUsers = await User.aggregate([
       {
-        $addFields: {
-          totalHomework: { $sum: "$grades.score" },
+        $match: {
+          age: {
+            $gt: 24,
+            $lt: 30,
+          },
         },
       },
       {
-        $addFields: { totalScore1: ["$totalHomework", "$age"] },
+        $group: {
+          _id: "$age",
+          counter: {
+            $sum: 1,
+          },
+        },
       },
     ]);
-
-    res.send(allUsers);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-router.get("/test2", async (req, res) => {
-  try {
-    const allUsers = await User.aggregate([]);
 
     res.send(allUsers);
   } catch (error) {
