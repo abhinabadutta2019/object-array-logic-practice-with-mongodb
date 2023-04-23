@@ -21,58 +21,27 @@ router.get("/test", async (req, res) => {
       {
         $unwind: "$grades",
       },
-      //grades less than 20
-      { $match: { "grades.score": { $lte: 30 } } },
-
-      //prottek er same object te dhukche
-
+      //match --zip that starts with -5
       {
-        $group: {
-          //random means all together
-          _id: "random",
-          //eta theke max Age^^^ among all^^^^^^^^^^^^^^^^^
-          minAge: { $max: "$age" },
-          //eta theke avarage score
-          avgScore: { $avg: "$grades.score" },
+        $match: { "address.zip": /^5/ },
+      },
+
+      //eta korle prottekta individual _id er -- thoseSubjects-array te dhukche
+      {
+        $group: { _id: "random", thoseSubjects: { $push: "$grades.score" } },
+      },
+      //
+      {
+        $project: {
+          //working
+          sumMarksSubjects: { $sum: "$thoseSubjects" },
+          //working 1
+          // avgMarksSubjects1: { $avg: "$thoseSubjects" },
+          // //working 2
+          // maxMarksSubjects2: { $max: "$thoseSubjects" },
           //
-          sumScores: { $sum: "$grades.score" },
         },
       },
-
-      //project example
-      //project diye field er naam change
-      {
-        $project: {
-          youngest: "$minAge",
-          গড়: "$avgScore",
-        },
-      },
-      //
-      //   [
-      //     {
-      //         "_id": "random",
-      //         "youngest": 69,
-      //         "গড়": 15.016501650165017
-      //     }
-      // ]
-      //
-      //
-
-      //project example
-      //project diye field hide kora hocche
-      // ba jei field dorkar dekhano hocche
-      {
-        $project: {
-          গড়: 1,
-        },
-      },
-      //
-      //   [
-      //     {
-      //         "_id": "random",
-      //         "গড়": 15.016501650165017
-      //     }
-      // ]
     ]);
 
     res.send(allUsers);
@@ -80,45 +49,41 @@ router.get("/test", async (req, res) => {
     res.status(500).send(error);
   }
 });
-
-//project use kore field er name hobar por-- ---then unwind ba group...etc kora hole-- updated fieldname use hoi
+//sort - this not giving result
 router.get("/test1", async (req, res) => {
   try {
     const allUsers = await User.aggregate([
-      //
+      //unwind
       {
-        $project: {
-          age: 1,
-          grades: 1,
-        },
+        $unwind: "$grades",
+      },
+      //match --zip that starts with -5
+      {
+        $match: { "address.zip": /^5/ },
+      },
+
+      //eta korle prottekta individual _id er -- thoseSubjects-array te dhukche
+      {
+        $group: { _id: "random", thoseSubjects: { $push: "$grades.score" } },
       },
       //
-      {
-        $project: {
-          age: "$age",
-          গ্রেড: "$grades",
-        },
-      },
-      //project er por jokhon unwind
-      {
-        $unwind: {
-          path: "$গ্রেড",
-        },
-      },
+      // {
+      //   $project: {
+      //     _id: 0,
+      //     // input: "$thoseSubjects",
+      //     // sortBy: 1,
+      //     //its giving result- but not sorting
+      //     // pSubjects: { input: "$thoseSubjects", sortBy: 1 },
+      //   },
+      // },
+
       //
-      {
-        $group: {
-          _id: "random",
-          গ্রেডAvg: { $avg: "$গ্রেড.score" },
-        },
-      },
+      // {
+      //   $sortArray: { input: "$thoseSubjects", sortBy: 1 },
+      // },
+
       //
-      //   [
-      //     {
-      //         "_id": "random",
-      //         "গ্রেডAvg": 50.791
-      //     }
-      // ]
+      { $sort: { thoseSubjects: -1 } },
     ]);
 
     res.send(allUsers);
@@ -126,24 +91,29 @@ router.get("/test1", async (req, res) => {
     res.status(500).send(error);
   }
 });
-
-//
+//this working -- but no point to push to array
+//sort korar bepare unwind kore sort korte holo
 router.get("/test2", async (req, res) => {
   //gets all user age $lte  25
   try {
-    const allUsers = await User.aggregate([]);
-
-    res.send(allUsers);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-//
-router.get("/test3", async (req, res) => {
-  //gets all user age $lte  25
-  try {
-    const allUsers = await User.aggregate([]);
+    const allUsers = await User.aggregate([
+      { $unwind: "$grades" },
+      { $match: { "address.zip": /^5/ } },
+      {
+        $group: {
+          _id: "random",
+          thoseSubjects: { $push: "$grades.score" },
+        },
+      },
+      { $unwind: "$thoseSubjects" },
+      { $sort: { thoseSubjects: -1 } },
+      {
+        $group: {
+          _id: "$_id",
+          thoseSubjects: { $push: "$thoseSubjects" },
+        },
+      },
+    ]);
 
     res.send(allUsers);
   } catch (error) {
