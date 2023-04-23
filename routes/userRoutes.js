@@ -25,6 +25,16 @@ router.get("/test", async (req, res) => {
       {
         $match: { age: { $lte: 25 } },
       },
+
+      //limit- only gives the first document  vs skip gives all documents -except the first one
+
+      {
+        $skip: 1,
+      },
+
+      {
+        $limit: 1,
+      },
     ]);
 
     res.send(allUsers);
@@ -46,6 +56,12 @@ router.get("/test1", async (req, res) => {
       {
         $match: { "grades.score": { $lte: 20 } },
       },
+
+      // skip and limit works for pagination
+      //say each page show 10 documents-- skip first 5 pages ( 10*5 document),then only show 10 document- limit of that page
+      //
+      { $skip: 10 * 5 },
+      { $limit: 10 },
     ]);
 
     res.send(allUsers);
@@ -54,67 +70,67 @@ router.get("/test1", async (req, res) => {
   }
 });
 
-//
-router.get("/test2", async (req, res) => {
-  try {
-    const allUsers = await User.aggregate([
-      //unwind diye array related example
+// //
+// router.get("/test2", async (req, res) => {
+//   try {
+//     const allUsers = await User.aggregate([
+//       //unwind diye array related example
 
-      {
-        $unwind: "$grades",
-      },
-      //sob user er "Subject 1" er value asche
-      {
-        $match: { "grades.subject": "Subject 1" },
-      },
-    ]);
+//       {
+//         $unwind: "$grades",
+//       },
+//       //sob user er "Subject 1" er value asche
+//       {
+//         $match: { "grades.subject": "Subject 1" },
+//       },
+//     ]);
 
-    res.send(allUsers);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+//     res.send(allUsers);
+//   } catch (error) {
+//     res.status(500).send(error);
+//   }
+// });
 
-//match e duto condition
-router.get("/test3", async (req, res) => {
-  try {
-    const allUsers = await User.aggregate([
-      //unwind diye array related example
+// //match e duto condition
+// router.get("/test3", async (req, res) => {
+//   try {
+//     const allUsers = await User.aggregate([
+//       //unwind diye array related example
 
-      {
-        $unwind: "$grades",
-      },
+//       {
+//         $unwind: "$grades",
+//       },
 
-      {
-        $match: {
-          "grades.subject": "Subject 1",
-          //sob user , jader score  "Subject 1" e 20 er kom
-          "grades.score": { $lte: 20 },
-        },
-      },
-    ]);
-    res.send(allUsers);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+//       {
+//         $match: {
+//           "grades.subject": "Subject 1",
+//           //sob user , jader score  "Subject 1" e 20 er kom
+//           "grades.score": { $lte: 20 },
+//         },
+//       },
+//     ]);
+//     res.send(allUsers);
+//   } catch (error) {
+//     res.status(500).send(error);
+//   }
+// });
 
-router.get("/test4", async (req, res) => {
-  try {
-    const allUsers = await User.aggregate([
-      //object related / array related noi tai -- unwind lagche naa
-      // {
-      //   $unwind: "$grades",
-      // },
-      //match kora hocche zip $gte: "50000", $lte: "70000"--
-      {
-        $match: { "address.zip": { $gte: "50000", $lte: "70000" } },
-      },
-    ]);
-    res.send(allUsers);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+// router.get("/test4", async (req, res) => {
+//   try {
+//     const allUsers = await User.aggregate([
+//       //object related / array related noi tai -- unwind lagche naa
+//       // {
+//       //   $unwind: "$grades",
+//       // },
+//       //match kora hocche zip $gte: "50000", $lte: "70000"--
+//       {
+//         $match: { "address.zip": { $gte: "50000", $lte: "70000" } },
+//       },
+//     ]);
+//     res.send(allUsers);
+//   } catch (error) {
+//     res.status(500).send(error);
+//   }
+// });
 
 module.exports = router;
