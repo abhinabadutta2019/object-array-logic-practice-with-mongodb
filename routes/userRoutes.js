@@ -14,7 +14,63 @@ router.get("/all", async (req, res) => {
   }
 });
 
-//How many people have a score of 20 or lower in all subjects combined
+//How many people have a score of 80 or lower in all subjects combined
+router.get("/find1", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+
+    const emptyArray = [];
+    //
+    // let scoreCombined = 0;
+
+    for (let index = 0; index < allUsers.length; index++) {
+      const element = allUsers[index];
+      //
+      // console.log(element.grades);
+      //
+      let elementGradesArray = element.grades;
+      // console.log(elementGradesArray);
+      //
+      let scoreCombined = 0;
+      // console.log(scoreCombined, "outer/before");
+      //
+      for (let index = 0; index < elementGradesArray.length; index++) {
+        // console.log(elementGradesArray[index]);
+        // console.log(elementGradesArray[index].score);
+        let individualSubjectScore = elementGradesArray[index].score;
+        // console.log(individualSubjectScore);
+        //
+        scoreCombined = scoreCombined + individualSubjectScore;
+      }
+      if (scoreCombined < 80) {
+        // console.log(element, "Total object");
+        // console.log(scoreCombined, "combined score");
+        emptyArray.push(element);
+      }
+      // console.log(scoreCombined, "inner");
+      // console.log(element);
+    }
+
+    res.send(emptyArray);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.get("/find2", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+
+    console.log(typeof allUsers);
+    res.send(allUsers);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+///////////////////////////////////////////////////////////////////////////////////////////////
+//aggregate
+//////////////////////////////
+
 router.get("/test", async (req, res) => {
   try {
     const allUsers = await User.aggregate([]);
@@ -27,49 +83,7 @@ router.get("/test", async (req, res) => {
 // How many people have a score of 30 to 35 higher in "Subject 1" and "Subject 4"?
 router.get("/test1", async (req, res) => {
   try {
-    const allUsers = await User.aggregate([
-      {
-        $unwind: {
-          path: "$grades",
-        },
-      },
-      {
-        $match: {
-          $or: [
-            {
-              "grades.subject": "Subject 1",
-            },
-            {
-              "grades.subject": "Subject 2",
-            },
-          ],
-        },
-      },
-      {
-        $match: {
-          "grades.score": {
-            $gt: 30,
-            $lt: 75,
-          },
-        },
-      },
-      {
-        $group: {
-          _id: "$name",
-          fieldN: {
-            $sum: 1,
-          },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          fieldN: {
-            $sum: 1,
-          },
-        },
-      },
-    ]);
+    const allUsers = await User.aggregate([]);
 
     res.send(allUsers);
   } catch (error) {
@@ -80,66 +94,7 @@ router.get("/test1", async (req, res) => {
 router.get("/test2", async (req, res) => {
   try {
     //
-    const highestSubject2 = await User.aggregate([
-      {
-        $unwind: {
-          path: "$grades",
-        },
-      },
-      {
-        $match: {
-          "grades.subject": "Subject 2",
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          highestScore: {
-            $max: "$grades.score",
-          },
-        },
-      },
-      {
-        $sort: {
-          highestScore: -1,
-        },
-      },
-      {
-        $limit: 1,
-      },
-    ]);
-    //
-    console.log(highestSubject2);
-    //
-    const lowestSubject3 = await User.aggregate([
-      {
-        $unwind: {
-          path: "$grades",
-        },
-      },
-      {
-        $match: {
-          "grades.subject": "Subject 2",
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          highestScore: {
-            $min: "$grades.score",
-          },
-        },
-      },
-      {
-        $sort: {
-          highestScore: 1,
-        },
-      },
-      {
-        $limit: 1,
-      },
-    ]);
-    console.log(lowestSubject3);
+    const allUsers = await User.aggregate([]);
     res.send(allUsers);
   } catch (error) {
     res.status(500).send(error);
