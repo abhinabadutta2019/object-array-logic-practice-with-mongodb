@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const User = require("../model/user");
+const e = require("express");
 const router = express.Router();
 
 router.get("/all", async (req, res) => {
@@ -14,59 +15,122 @@ router.get("/all", async (req, res) => {
   }
 });
 
-//How many people have a score of 80 or lower in all subjects combined
+//What is the average score of people aged 25 or younger in "Subject 3"?
+//for loop
 router.get("/find1", async (req, res) => {
   try {
     const allUsers = await User.find({});
-
-    const emptyArray = [];
     //
-    // let scoreCombined = 0;
-
+    let ageLessThan = [];
+    //
     for (let index = 0; index < allUsers.length; index++) {
-      const element = allUsers[index];
-      //
-      // console.log(element.grades);
-      //
-      let elementGradesArray = element.grades;
-      // console.log(elementGradesArray);
-      //
-      let scoreCombined = 0;
-      // console.log(scoreCombined, "outer/before");
-      //
-      for (let index = 0; index < elementGradesArray.length; index++) {
-        // console.log(elementGradesArray[index]);
-        // console.log(elementGradesArray[index].score);
-        let individualSubjectScore = elementGradesArray[index].score;
-        // console.log(individualSubjectScore);
-        //
-        scoreCombined = scoreCombined + individualSubjectScore;
-      }
-      if (scoreCombined < 80) {
-        // console.log(element, "Total object");
-        // console.log(scoreCombined, "combined score");
-        emptyArray.push(element);
-      }
-      // console.log(scoreCombined, "inner");
-      // console.log(element);
-    }
+      //eta correct
+      const element = allUsers[index].grades;
 
-    res.send(emptyArray);
+      // const element = allUsers[index];
+
+      //checking age
+
+      if (allUsers[index].age < 26) {
+        //
+        // console.log(allUsers[index]);
+        // console.log(element, "grades array");
+
+        //grades array portion
+        for (let j = 0; j < element.length; j++) {
+          const eachGradesObject = element[j];
+          //
+          // console.log(eachGradesObject, "eachGradesObject");
+          if (eachGradesObject.subject === "Subject 3") {
+            //
+            // console.log(eachGradesObject.score, "eachGradesObject");
+            //
+            ageLessThan.push(eachGradesObject.score);
+          }
+        }
+      }
+    }
+    //
+    // console.log(ageLessThan);
+    let sumageLessThan = ageLessThan.reduce(function (
+      accumulator,
+      currentValue
+    ) {
+      accumulator = accumulator + currentValue;
+      return accumulator;
+    });
+    // console.log(sumageLessThan);
+
+    // let ageLessThanLength = ageLessThan.length;
+    // console.log(ageLessThanLength);
+
+    //
+    let ageLessThanAvarage = sumageLessThan / ageLessThan.length;
+    console.log(ageLessThanAvarage);
+    //
+
+    res.send();
   } catch (error) {
     res.status(500).send(error);
   }
 });
 
+//What is the average score of people aged 25 or younger in "Subject 3"?
+//forEach
 router.get("/find2", async (req, res) => {
   try {
     const allUsers = await User.find({});
+    //foreach age
+    //array to store age<25
+    let ageLessThan = [];
+    allUsers.forEach(function (element) {
+      //
+      if (element.age < 25) {
+        // console.log(element);
+        //
+        ageLessThan.push(element);
+      }
+      //
+    });
+    //
 
-    console.log(typeof allUsers);
-    res.send(allUsers);
+    //array to store subject 3 marks
+    let subject3Marks = [];
+
+    //
+    ageLessThan.forEach(function (params) {
+      //
+      // console.log(params.grades, "gradesArray Part");
+      //
+      let gradesArray = params.grades;
+      //
+      gradesArray.forEach(function (eachSubject) {
+        // console.log(eachSubject);
+        if (eachSubject.subject === "Subject 3") {
+          // console.log(eachSubject.score);
+          subject3Marks.push(eachSubject.score);
+        }
+      });
+    });
+    // console.log(subject3Marks);
+    //
+    //
+    let totalSum = 0;
+    //
+    subject3Marks.forEach(function (eachItem) {
+      totalSum = totalSum + eachItem;
+    });
+    console.log(totalSum);
+    //
+    let avarageScore = totalSum / subject3Marks.length;
+    console.log(avarageScore, "avarageScore");
+    //
+    res.send();
   } catch (error) {
     res.status(500).send(error);
   }
 });
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //aggregate
 //////////////////////////////
