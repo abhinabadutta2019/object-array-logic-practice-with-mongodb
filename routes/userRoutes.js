@@ -14,54 +14,42 @@ router.get("/all", async (req, res) => {
   }
 });
 
-//How many people have a score of 30 or higher in "Subject 1" and "Subject 4"?
+//
 
-router.get("/try1", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-
-    let emptyArray = [];
-
-    allUsers.filter(function (element) {
-      // console.log(element.grades);
-      //
-      let gradesArray = element.grades;
-      //
-      gradesArray.filter(function (eachGrade) {
-        // console.log(eachGrade);
-
-        //
-
-        //check if less than in subject2
-        if (eachGrade.subject === "Subject 2" && eachGrade.score < 30) {
-          // console.log(eachGrade);
-          // console.log(element.grades);
-          let fourthSubject = element.grades;
-          //
-          fourthSubject.filter(function (eachMarks) {
-            // console.log(eachMarks);
-            if (eachMarks.subject === "Subject 4" && eachMarks.score < 30) {
-              // console.log(eachMarks);
-              emptyArray.push(element);
-            }
-          });
-        }
-      });
-      // console.log(emptyArray);
-    });
-
-    res.send(emptyArray);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+//How many people have a score of 30 or lower in Subject 2 and Subject 4?
 
 router.get("/try2", async (req, res) => {
   try {
     const allUsers = await User.find({});
 
-    console.log(typeof allUsers);
-    res.send(allUsers);
+    let emptyArray = [];
+
+    allUsers.forEach(function (individualItem) {
+      // console.log(individualItem);
+      //
+      let gradesArray = individualItem.grades;
+      //
+      //
+      gradesArray.forEach(function (eachSubject) {
+        // console.log(eachSubject);
+        if (eachSubject.subject === "Subject 2" && eachSubject.score < 30) {
+          // console.log(individualItem, "individualItem");
+          //
+          let lowInSecond = individualItem.grades;
+          //
+          lowInSecond.forEach(function (oneScore) {
+            if (oneScore.subject === "Subject 4" && oneScore.score < 30) {
+              // console.log(individualItem);
+
+              //
+              emptyArray.push(individualItem);
+            }
+          });
+        }
+      });
+    });
+
+    res.send(emptyArray);
   } catch (error) {
     res.status(500).send(error);
   }
