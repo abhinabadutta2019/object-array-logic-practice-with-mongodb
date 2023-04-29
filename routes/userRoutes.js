@@ -16,40 +16,72 @@ router.get("/all", async (req, res) => {
 
 //
 
-//How many people have a score of 30 or lower in Subject 2 and Subject 4?
+//solved by gpt
+router.get("/try6", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    const filteredUsers = allUsers.filter((user) => {
+      let score2 = user.grades.find((grade) => grade.subject === "Subject 2");
+      let score4 = user.grades.find((grade) => grade.subject === "Subject 4");
+      return score2.score <= 30 && score4.score <= 30;
+    });
+    const count = filteredUsers.length;
+    res.send({ count });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
-router.get("/try2", async (req, res) => {
+//solved by gpt
+router.get("/try4", async (req, res) => {
   try {
     const allUsers = await User.find({});
 
-    let emptyArray = [];
-
-    allUsers.forEach(function (individualItem) {
-      // console.log(individualItem);
-      //
+    let filteredArray = allUsers.filter(function (individualItem) {
       let gradesArray = individualItem.grades;
-      //
-      //
-      gradesArray.forEach(function (eachSubject) {
-        // console.log(eachSubject);
-        if (eachSubject.subject === "Subject 2" && eachSubject.score < 30) {
-          // console.log(individualItem, "individualItem");
-          //
-          let lowInSecond = individualItem.grades;
-          //
-          lowInSecond.forEach(function (oneScore) {
-            if (oneScore.subject === "Subject 4" && oneScore.score < 30) {
-              // console.log(individualItem);
 
-              //
-              emptyArray.push(individualItem);
-            }
-          });
-        }
+      let filteredSubject2 = gradesArray.filter(function (eachSubject) {
+        return eachSubject.subject === "Subject 2" && eachSubject.score <= 30;
       });
+
+      let filteredSubject4 = gradesArray.filter(function (eachSubject) {
+        return eachSubject.subject === "Subject 4" && eachSubject.score <= 30;
+      });
+
+      return filteredSubject2.length > 0 && filteredSubject4.length > 0;
     });
 
-    res.send(emptyArray);
+    res.send(filteredArray);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+//solved by gpt
+router.get("/try5", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+
+    let filteredUsers = allUsers.filter((individualItem) => {
+      let foundLowScore2 = false;
+      let foundLowScore4 = false;
+
+      individualItem.grades.forEach((grade) => {
+        if (grade.subject === "Subject 2" && grade.score <= 30) {
+          foundLowScore2 = true;
+        }
+        if (grade.subject === "Subject 4" && grade.score <= 30) {
+          foundLowScore4 = true;
+        }
+      });
+      //
+      console.log(foundLowScore2, "foundLowScore2");
+      console.log(foundLowScore4, "foundLowScore4");
+
+      return foundLowScore2 && foundLowScore4;
+    });
+
+    res.send(filteredUsers);
   } catch (error) {
     res.status(500).send(error);
   }
