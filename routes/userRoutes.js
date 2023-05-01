@@ -13,133 +13,70 @@ router.get("/all", async (req, res) => {
   }
 });
 
-//solved by gpt
-//Find all the persons who have not scored less than 50 in any subject.
-router.get("/try7", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-
-    //
-    let filterArray = allUsers.filter(function (eachBud) {
-      let gradesArray = eachBud.grades;
-      //
-      let filterGrades = gradesArray.filter(function (eachTopic) {
-        if (eachTopic.score < 50) {
-          return true;
-        }
-      });
-      console.log(filterGrades);
-      return filterGrades.length === 0;
-    });
-
-    res.send(filterArray);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-//solved by gpt
-router.get("/try16", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-
-    let filteredArray = allUsers.filter(function (user) {
-      let gradesArray = user.grades;
-
-      // check if any grade score is less than 10
-      let hasScoreLessThan10 = gradesArray.filter(function (grade) {
-        return grade.score < 50;
-      });
-      //
-      console.log(hasScoreLessThan10);
-      return !hasScoreLessThan10;
-    });
-
-    res.send(filteredArray);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-//Find all users whose age is between 22 and 25.
+//Find all the persons who have scored less than 50 in all subject.
 router.get("/try1", async (req, res) => {
   try {
     const allUsers = await User.find({});
     //
-    let emptyArray = allUsers.filter(function (eachBuds) {
+    let outerFilterArray = allUsers.filter(function (eachObject) {
+      let gradesArray = eachObject.grades;
       //
-      let budAge = eachBuds.age;
-
-      return budAge <= 25 && budAge >= 22;
+      let innerFilterArray = gradesArray.filter(function (eachItem) {
+        console.log(eachItem);
+        return eachItem.score > 50;
+      });
+      // console.log(innerFilterArray);
+      return innerFilterArray.length < 1;
     });
-    res.send(emptyArray);
+
+    res.send(outerFilterArray);
   } catch (error) {
     res.status(500).send(error);
   }
 });
 
-//Find all the persons who live in "City 4".
+//Find all the persons who have not scored less than 50 in any subject.
 router.get("/try2", async (req, res) => {
   try {
     const allUsers = await User.find({});
-
-    let filteredArray = allUsers.filter(function (oneBud) {
-      console.log(oneBud.address.city);
-      return oneBud.address.city === "City 4";
+    let outerFilterArray = allUsers.filter(function (eachObject) {
+      let gradesArray = eachObject.grades;
+      //
+      let innerFilterArray = gradesArray.filter(function (eachItem) {
+        console.log(eachItem);
+        return eachItem.score < 50;
+      });
+      // console.log(innerFilterArray);
+      return innerFilterArray.length < 1;
     });
 
-    res.send(filteredArray);
+    res.send(outerFilterArray);
   } catch (error) {
     res.status(500).send(error);
   }
 });
 
-//Find all the persons who have scored less than 7 in "Subject 2" and scored less than 50 in "Subject 3"
+//have scored more than 40 in all subjects
 router.get("/try3", async (req, res) => {
   try {
     const allUsers = await User.find({});
 
-    let epmtyFilteredArray = allUsers.filter(function (oneBud) {
-      let gradeArray = oneBud.grades;
+    let outerArrayFilter = allUsers.filter(function (eachObject) {
+      let gradeArray = eachObject.grades;
       //
-      let subject2Array = gradeArray.filter(function (eachItem) {
-        return eachItem.subject === "Subject 2" && eachItem.score < 7;
+      let innerFilter = gradeArray.filter(function (eachTopic) {
+        // console.log(eachTopic.score, "eachTopic.score");
+        return eachTopic.score < 40;
+        // return true;
       });
-      console.log(subject2Array);
+      console.log(innerFilter, "innerFilter");
       //
-      let subject3Array = gradeArray.filter(function (eachBishoy) {
-        return eachBishoy.subject === "Subject 3";
-      });
+      return innerFilter.length === 0;
+      // return !(innerFilter.length > 0);
       //
-      return subject2Array.length > 0 && subject3Array[0].score < 50;
     });
 
-    res.send(epmtyFilteredArray);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-//Find all the persons who live in "State 14" and have scored more than 80 in any subject
-router.get("/try4", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    //
-    let filterArray = allUsers.filter(function (eachBud) {
-      //
-      let gradeArray = eachBud.grades;
-      //
-      let filterMarksArray = gradeArray.filter(function (eachTopic) {
-        return eachTopic.score > 80;
-      });
-
-      // console.log(eachBud.address.state);
-      //
-      return (
-        filterMarksArray.length > 0 && eachBud.address.state === "State 13"
-      );
-    });
-    //
-    res.send(filterArray);
+    res.send(outerArrayFilter);
   } catch (error) {
     res.status(500).send(error);
   }
