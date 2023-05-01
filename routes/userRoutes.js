@@ -7,204 +7,99 @@ router.get("/all", async (req, res) => {
   try {
     const allUsers = await User.find({});
 
-    res.send(allUsers);
+    res.send();
   } catch (error) {
     res.status(500).send(error);
   }
 });
-
-/////////////////////////
-
-// kutti explained filter with different object
-// For loop
-// -
-// -
-// const finalStudents = [];
-
-// for (let i = 0; i < arr.length; i++) {
-//     const student = arr[i];
-
-//     const mathScore = -1;
-//     const englishScore = -1;
-
-//     for (let j = 0; j < student.scores.length; j++) {
-//         const score = student.scores[j];
-//         if (score.subject === 'Math') {
-//             mathScore = score.score;
-//         } else if (score.subject === 'English') {
-//             englishScore = score.score;
-//         }
-//     }
-
-//     if (mathScore >= 80 && englishScore >= 80) {
-//         finalStudents.push(student);
-//     }
-// }
-
-// -
-// -
-// -
-// Filter Process 1
-// -
-// -
-// -
-// const finalStudents2 = arr.filter((student) => {
-//     const mathScore = -1 //const na let hobe
-//     const englishScore = -1;//const na let hobe
-//     student.scores.forEach((score) => {
-//         if (score.subject === 'Math') {
-//             mathScore = score.score;
-//         } else if (score.subject === 'English') {
-//             englishScore = score.score;
-//         }
-//     })
-
-//     if (mathScore >= 80 && englishScore >= 80) {
-//         return true;
-//     }
-// });
-
-// -
-// -
-
-// —---
-// —--
-// Filter Process 2
-// —-
-
-// const finalStudents3 = arr.filter((student) => {
-//     const gradesArray = student.scores;
-//     //[]
-//     // [{}]
-//     const mathScore = gradesArray.filter((subject) => {
-//         if (subject.subject === 'Math' && subject.score >= 80) {
-//             return true;
-//         }
-//     });
-//     //[]
-//     // [{}]
-//     const englishScore = gradesArray.filter((subject) => {
-//         return subject.subject === 'English' && subject.score >= 80;
-//     });
-
-//     return mathScore.length > 0 && englishScore.length > 0;
-// });
-
-// —
-// -
-
-// -
-// -
-// const finalStudents4 = arr.filter((student) => {
-//     const gradesArray = student.scores;
-
-//     // [{}]
-//     const mathScore = gradesArray.filter((subject) => {
-//         return subject.subject === 'Math';
-//     });
-
-//     // [{}]
-//     const englishScore = gradesArray.filter((subject) => {
-//         return subject.subject === 'English';
-//     });
-
-//     if (mathScore[0].score >= 80 && englishScore[0].score >= 80) {
-//         return true;
-//     }
-// });
-
-//
-
-//if mathscore less than 5, filter method
+//if "Subject 1" score less than 5, filter method--then add if if "Subject 2" score less than 35
+//method 1
 router.get("/try1", async (req, res) => {
   try {
     const allUsers = await User.find({});
+
     //
 
-    const finalStudentArray = allUsers.filter(function (student) {
+    let filterResult = allUsers.filter(function (individual) {
+      let gradesArray = individual.grades;
       //
-      let topicFirst = -1;
-
-      //
-      // return student;
-      student.grades.forEach(function (topic) {
-        // console.log(topic, "topic1");
-        //
-        if (topic.subject === "Subject 1") {
-          topicFirst = topic.score;
-
-          // console.log(topicFirst);
+      let filterSubject1 = gradesArray.filter(function (eachSubject) {
+        if (eachSubject.subject === "Subject 1" && eachSubject.score < 5) {
+          return true;
         }
       });
-      //ei part ta important
-      if (topicFirst < 5) {
-        return true;
-      }
+      //
+      let filterSubject2 = gradesArray.filter(function (perSubject) {
+        return perSubject.subject === "Subject 2" && perSubject.score < 40;
+      });
+      //
+      console.log(filterSubject1);
+      //
+      return filterSubject1.length > 0 && filterSubject2.length > 0;
     });
+    // console.log(filterResult);
 
-    // res.send();
-    res.send(finalStudentArray);
+    res.send(filterResult);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-
-//if Subject1 score less than 5, and if Subject2 score lless than 35 , filter method
+//method 2
 router.get("/try2", async (req, res) => {
   try {
     const allUsers = await User.find({});
     //
-    let finalFilterd = allUsers.filter(function (student) {
+    let subject1Marks = -1;
+    let subject2Marks = -1;
+    //
+    let finalFilterArray = allUsers.filter(function (perUser) {
       //
-      let gradesArray = student.grades;
-      //Subject 1
-      let subjectAndScore = gradesArray.filter(function (subject) {
+      let gradesArray = perUser.grades;
+      //
+      let subject1Filter = gradesArray.filter(function (oneBishoy) {
         //
-        if (subject.subject === "Subject 1" && subject.score <= 5) {
-          //
+        subject1Marks = oneBishoy.score;
+        //
+        if (oneBishoy.subject === "Subject 1" && subject1Marks < 5) {
           return true;
         }
       });
-
-      //Subject 2
-      let subjectAndScore2 = gradesArray.filter(function (subject) {
-        //
-        if (subject.subject === "Subject 2" && subject.score <= 35) {
-          //
-          return true;
-        }
-      });
-
       //
-      // console.log(subjectAndScore2);
-      return subjectAndScore2.length > 0 && subjectAndScore.length > 0;
+      let subject2Filter = gradesArray.filter(function (oneSub) {
+        subject1Marks = oneSub.score;
+        return subject1Marks > 25 && oneSub.subject === "Subject 3";
+      });
+      console.log(subject2Filter);
+      return subject1Filter.length > 0 && subject2Filter.length > 0;
     });
-
-    res.send(finalFilterd);
+    res.send(finalFilterArray);
   } catch (error) {
     res.status(500).send(error);
   }
 });
 
-//if Subject1 score less than 5,
+//if "Subject 1" score less than 10
+//
 router.get("/try3", async (req, res) => {
   try {
     const allUsers = await User.find({});
-    //
-    let finalArray = allUsers.filter(function (student) {
+
+    emptyArray = allUsers.filter(function (oneBird) {
+      let onlyGrades = oneBird.grades;
       //
-      let gradesArray = student.grades;
-      //
-      let subject1Score = gradesArray.filter(function (params) {
-        return params.subject === "Subject 1";
+      let subject1Array = onlyGrades.filter(function (oneBishoy) {
+        return oneBishoy.subject === "Subject 1";
+        //
       });
       //
-      // console.log(subject1Score);
-      if (subject1Score[0].score < 5) {
+      // console.log(subject1Array, "subject1Array");
+      //
+      if (subject1Array[0].score < 10) {
         return true;
       }
     });
-    res.send(finalArray);
+
+    res.send(emptyArray);
   } catch (error) {
     res.status(500).send(error);
   }
