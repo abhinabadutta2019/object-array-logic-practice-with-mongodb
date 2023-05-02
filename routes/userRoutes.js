@@ -13,74 +13,66 @@ router.get("/all", async (req, res) => {
   }
 });
 
-//Find all the persons who have scored less than 50 in all subject.
+//Find all the persons who have scored less than 50 in "Subject 3" or have a score greater than or equal to 80 in "Subject 4".
+//not diye korbo
 router.get("/try1", async (req, res) => {
   try {
     const allUsers = await User.find({});
     //
-    let outerFilterArray = allUsers.filter(function (eachObject) {
+    let outerFilter = allUsers.filter(function (eachObject) {
       let gradesArray = eachObject.grades;
       //
-      let innerFilterArray = gradesArray.filter(function (eachItem) {
-        console.log(eachItem);
-        return eachItem.score > 50;
+      let innerFilter = gradesArray.filter(function (item) {
+        //
+        if (item.subject === "Subject 3" && !(item.score > 50)) {
+          // return item.subject === "Subject 4" && item.score > 1;
+          return true;
+        }
       });
-      // console.log(innerFilterArray);
-      return innerFilterArray.length < 1;
+      //
+      let innerFilterForSubject4 = gradesArray.filter(function (item) {
+        return item.subject === "Subject 4" && item.score > 80;
+      });
+      return innerFilter.length > 0 && innerFilterForSubject4.length > 0;
     });
-
-    res.send(outerFilterArray);
+    res.send(outerFilter);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-
-//Find all the persons who have not scored less than 50 in any subject.
+//Find all the persons who have not scored less than 60 in any subject and have an even age.
 router.get("/try2", async (req, res) => {
   try {
     const allUsers = await User.find({});
-    let outerFilterArray = allUsers.filter(function (eachObject) {
-      let gradesArray = eachObject.grades;
+    //
+    let outerArray = allUsers.filter(function (eachObject) {
       //
-      let innerFilterArray = gradesArray.filter(function (eachItem) {
-        console.log(eachItem);
-        return eachItem.score < 50;
+      let gradesArray = eachObject.grades;
+
+      let innerArray = gradesArray.filter(function (item) {
+        // console.log(item);
+        return item.score < 60;
       });
-      // console.log(innerFilterArray);
-      return innerFilterArray.length < 1;
+
+      return innerArray.length < 1;
     });
 
-    res.send(outerFilterArray);
+    res.send(outerArray);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-
-//have scored more than 40 in all subjects
+//
 router.get("/try3", async (req, res) => {
   try {
     const allUsers = await User.find({});
 
-    let outerArrayFilter = allUsers.filter(function (eachObject) {
-      let gradeArray = eachObject.grades;
-      //
-      let innerFilter = gradeArray.filter(function (eachTopic) {
-        // console.log(eachTopic.score, "eachTopic.score");
-        return eachTopic.score < 40;
-        // return true;
-      });
-      console.log(innerFilter, "innerFilter");
-      //
-      return innerFilter.length === 0;
-      // return !(innerFilter.length > 0);
-      //
-    });
-
-    res.send(outerArrayFilter);
+    res.send();
   } catch (error) {
     res.status(500).send(error);
   }
 });
+//
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //aggregate
 //////////////////////////////
