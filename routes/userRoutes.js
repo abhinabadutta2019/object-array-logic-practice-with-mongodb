@@ -12,168 +12,178 @@ router.get("/all", async (req, res) => {
     res.status(500).send(error);
   }
 });
-
-// Write a function that returns an array of objects with the name and age of each person
-//map+sort
-router.get("/try1", async (req, res) => {
-  try {
-    const allUsers = await User.find();
-    let outerArray = allUsers.map(function (params) {
-      return { age: params.age, name: params.name };
-    });
-    let k = outerArray.sort(function (firstItem, secondItem) {
-      //
-      return firstItem.age - secondItem.age;
-    });
-    res.send(k);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-// Write a function that returns an array of objects with the name and age of each person
-//for loop
-router.get("/try2", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    let emptyArray = [];
-    for (let index = 0; index < allUsers.length; index++) {
-      const element = allUsers[index];
-      let j = { eName: element.name, eAge: element.age };
-      emptyArray.push(j);
-    }
-    //
-    let k = emptyArray.sort(function (firstItem, secondItem) {
-      return secondItem.eAge - firstItem.eAge;
-    });
-    res.send(k);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-//Write a function that returns the average age of all the people in the objects.
-router.get("/try3", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    let sumOfAge = allUsers.reduce(function (accumulator, currentValue) {
-      // console.log(currentValue.age);
-      // console.log(accumulator, "accumulator");
-
-      return accumulator + currentValue.age;
-    }, 0);
-    console.log(sumOfAge);
-    let avgAge = sumOfAge / allUsers.length;
-
-    res.send({ avgAge });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-//Write a function that returns the average age of all the people in the objects.
-//with for loop
-router.get("/try4", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    let totalAge = 0;
-    //
-    for (let index = 0; index < allUsers.length; index++) {
-      const element = allUsers[index].age;
-      // console.log(element);
-      totalAge = totalAge + element;
-    }
-    // console.log(totalAge);
-    let totalUser = allUsers.length;
-    let avgAge1 = totalAge / totalUser;
-    //
-    res.send({ avgAge1 });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-//Write a function that returns the average age of all the people in the objects.
-//foreach
-router.get("/try5", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    let totalAge = 0;
-    allUsers.forEach(function (eachUsers) {
-      let oneAge = eachUsers.age;
-      totalAge = totalAge + oneAge;
-    });
-    //
-    let avgAge = totalAge / allUsers.length;
-
-    res.send({ avgAge });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-//highest score of each user
-router.get("/try6", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    //
-    let mapResult = allUsers.map(function (eachUsers) {
-      let gradesArray = eachUsers.grades;
-      // return gradesArray;
-      // console.log(gradesArray);
-      //
-      let maxValue = gradesArray.reduce(function (highValue, currentValue) {
-        if (currentValue.score > highValue) {
-          return currentValue.score;
-        } else {
-          return highValue;
-        }
-      }, -1);
-      // console.log(maxValue);
-      // return maxValue;
-      return { name: eachUsers.name, maxValue: maxValue };
-    });
-    res.send(mapResult);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+//
 //
 
 //highest score of each user
-//using for loop
-router.get("/try8", async (req, res) => {
+//forEach diye korbo
+router.get("/try1", async (req, res) => {
   try {
     const allUsers = await User.find({});
     let emptyArray = [];
-    //
-    for (let index = 0; index < allUsers.length; index++) {
-      const element = allUsers[index].grades;
+    allUsers.forEach(function (eachObj) {
+      let gradesArray = eachObj.grades;
       //
       let highScore = -1;
-      for (let index = 0; index < element.length; index++) {
-        // console.log(element[index].score, "element-index");
-        let currentScore = element[index].score;
-        if (currentScore > highScore) {
-          highScore = currentScore;
+      //
+      gradesArray.forEach(function (eachInnerObj) {
+        if (eachInnerObj.score > highScore) {
+          highScore = eachInnerObj.score;
         } else {
           highScore = highScore;
         }
-      }
+      });
+      let newObj = { highScore: highScore, name: eachObj.name };
       //
-      let p = { highScore: highScore, name: allUsers[index].name };
-      // console.log(p);
-      //
-      emptyArray.push(p);
-    }
+      emptyArray.push(newObj);
+    });
     res.send(emptyArray);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-//
-router.get("/try9", async (req, res) => {
+//Write a function that returns an object with the name and address of the person with the highest overall score.
+router.get("/try2", async (req, res) => {
   try {
     const allUsers = await User.find({});
-
+    //
+    let endArray = allUsers.map(function name(eachObj) {
+      let gradesArray = eachObj.grades;
+      //
+      let totalScore = gradesArray.reduce(function (accumulator, currentScore) {
+        // console.log(accumulator, "ac");
+        // console.log(currentScore.score, "cs");
+        return accumulator + currentScore.score;
+      }, 0);
+      return {
+        name: eachObj.name,
+        address: eachObj.address,
+        totalScore: totalScore,
+      };
+    });
+    //this portion done by gpt
+    let sortEndArray = endArray.reduce(
+      function (highScore, currentScore) {
+        if (highScore.totalScore < currentScore.totalScore) {
+          return currentScore;
+        } else {
+          return highScore;
+        }
+      },
+      { totalScore: -1 }
+    );
+    //
+    console.log(sortEndArray);
     res.send();
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+//Write a function that returns an object with the name and address of the person with the highest overall score.
+//with sort method
+router.get("/try3", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    //
+    let endArray = allUsers.map(function name(eachObj) {
+      let gradesArray = eachObj.grades;
+      //
+      let totalScore = gradesArray.reduce(function (accumulator, currentScore) {
+        // console.log(accumulator, "ac");
+        // console.log(currentScore.score, "cs");
+        return accumulator + currentScore.score;
+      }, 0);
+      return {
+        name: eachObj.name,
+        address: eachObj.address,
+        totalScore: totalScore,
+      };
+    });
+    //sort method
+    let k = endArray.sort(function (a, b) {
+      return b.totalScore - a.totalScore;
+    });
+    // console.log(k);
+    let highestObject = k[0];
+    res.send(highestObject);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+//Write a function that returns an object with the name and address of the person with the highest overall score.
+//use loop
+router.get("/try4", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    //
+    let emptyArray = [];
+    for (let index = 0; index < allUsers.length; index++) {
+      const element = allUsers[index].grades;
+      //
+      let totalScore = 0;
+      for (let index = 0; index < element.length; index++) {
+        const oneGradeObj = element[index];
+        // console.log(oneGradeObj, "oneGradeObj");
+        //
+        totalScore = totalScore + oneGradeObj.score;
+      }
+      let k = { totalScore: totalScore, name: allUsers[index].name };
+      emptyArray.push(k);
+    }
+    //
+    let highScore = -1;
+    let highName;
+    for (let index = 0; index < emptyArray.length; index++) {
+      let oneItem = emptyArray[index].totalScore;
+      if (oneItem > highScore) {
+        highScore = oneItem;
+        highName = emptyArray[index].name;
+      }
+    }
+    // console.log(highScore, highName);
+    let result = { highScore: highScore, highName: highName };
+    //
+    res.send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+//Write a function that returns an object with the name and address of the person with the highest overall score.
+//foreach
+router.get("/try5", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    //
+    let emptyArray = [];
+    allUsers.forEach(function (eachObj) {
+      let gradesArray = eachObj.grades;
+      //
+      let totalScore = 0;
+      gradesArray.forEach(function (eachSubj) {
+        // console.log(eachSubj, "eachSubj");
+        //
+        totalScore = totalScore + eachSubj.score;
+      });
+
+      //
+      let emtObj = { totalScore: totalScore, name: eachObj.name };
+      //
+      emptyArray.push(emtObj);
+      //
+    });
+    //
+    let tall = -1;
+    let tallName;
+    emptyArray.forEach(function (eachTotal) {
+      // console.log(eachTotal, "eachTotal");
+      if (eachTotal.totalScore > tall) {
+        tall = eachTotal.totalScore;
+        tallName = eachTotal.name;
+      }
+    });
+    const endResult = { tall: tall, tallName: tallName };
+    //
+    res.send(endResult);
   } catch (error) {
     res.status(500).send(error);
   }
