@@ -12,56 +12,33 @@ router.get("/all", async (req, res) => {
     res.status(500).send(error);
   }
 });
-//
-
-// sudhu 2 to subject e 20 er kom -
-//with filter method
+// print out the name and city of each person
+//map
 router.get("/try1", async (req, res) => {
   try {
     const allUsers = await User.find({});
-    let outerFilter = allUsers.filter(function (oneObj) {
-      let gradesArray = oneObj.grades;
-      //
-      let innerArray = gradesArray.filter(function (oneTopic) {
-        if (oneTopic.score < 5) {
-          return true;
-        }
-      });
-      // console.log(innerArray, "innerArray");
-      // console.log(innerArray.length);
-      return innerArray.length === 2;
+
+    let mapArray = allUsers.map(function (oneObj) {
+      return { name: oneObj.name, city: oneObj.address.city };
     });
 
-    res.send(outerFilter);
+    res.send(mapArray);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-
-// sudhu 0 theke 2 to subject e 20 er kom -
-//with for loop
-
+// print out the name and city of each person
+//for loop
 router.get("/try2", async (req, res) => {
   try {
     const allUsers = await User.find({});
     //
     let emptyArray = [];
-    //
     for (let i = 0; i < allUsers.length; i++) {
-      let element = allUsers[i].grades;
+      const element = allUsers[i];
       //
-      let filterLessThan = [];
-      //
-      for (let j = 0; j < element.length; j++) {
-        let oneItem = element[j];
-        //
-        if (oneItem.score < 7) {
-          filterLessThan.push(oneItem);
-        }
-      }
-      if (filterLessThan.length > 0 && filterLessThan.length < 3) {
-        emptyArray.push(allUsers[i]);
-      }
+      let p = { name: allUsers[i].name, city: allUsers[i].address.city };
+      emptyArray.push(p);
     }
 
     res.send(emptyArray);
@@ -69,110 +46,123 @@ router.get("/try2", async (req, res) => {
     res.status(500).send(error);
   }
 });
-// sudhu 2 to subject e 20 er kom -
-//forEach method
+//print out the average score of each person in the array.
+//map
 router.get("/try3", async (req, res) => {
   try {
     const allUsers = await User.find({});
-    //
-    let emptyArray = [];
-    allUsers.forEach(function (oneObj) {
+    let outerMap = allUsers.map(function (oneObj) {
+      //
+      let totalScore = 0;
       let gradesArray = oneObj.grades;
       //
-      let lessThanCutOff = 0;
-      gradesArray.forEach(function (oneTopic) {
-        //
-        if (oneTopic.score < 6) {
-          lessThanCutOff = lessThanCutOff + 1;
-        }
+      let innerMap = gradesArray.map(function (oneTopic) {
+        totalScore = totalScore + oneTopic.score;
+        return totalScore;
       });
-      if (lessThanCutOff === 2) {
-        emptyArray.push(oneObj);
-      }
+      let avgScore = totalScore / gradesArray.length;
+      // console.log(innerMap);
+      // console.log(avgScore);
+      // console.log(totalScore);
+      return { name: oneObj.name, avgScore: avgScore };
     });
 
-    res.send(emptyArray);
+    res.send(outerMap);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-//Find all the persons who have not scored less than 50 in any subject.
-//filter method
+//print out the average score of each person in the array.
+//map+reduce
 router.get("/try4", async (req, res) => {
   try {
     const allUsers = await User.find({});
-    let outerFilter = allUsers.filter(function (oneObj) {
+
+    let outerMap = allUsers.map(function (oneObj) {
       let gradesArray = oneObj.grades;
       //
-
-      let innerArray = gradesArray.filter(function (oneItem) {
-        if (oneItem.score < 50) {
-          return true;
-        }
-      });
-      // console.log(innerArray.length);
-      if (innerArray.length === 0) {
-        return true;
-      }
+      let innerReduce = gradesArray.reduce(function (
+        accumulator,
+        currentValue
+      ) {
+        accumulator = accumulator + currentValue.score;
+        return accumulator;
+      },
+      0);
+      return { avgScore: innerReduce / gradesArray.length, name: oneObj.name };
     });
-    res.send(outerFilter);
+
+    res.send(outerMap);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-//Find all the persons who have not scored less than 50 in any subject.
-//forloop method
+//print out the average score of each person in the array.
+//for loop
 router.get("/try5", async (req, res) => {
   try {
     const allUsers = await User.find({});
+    //
     let emptyArray = [];
     for (let i = 0; i < allUsers.length; i++) {
       const element = allUsers[i].grades;
       //
-      let cutOffArray = [];
-      //
+      let totalScore = 0;
       for (let j = 0; j < element.length; j++) {
-        const oneItem = element[j];
+        const oneTopic = element[j];
         //
-        if (oneItem.score < 46) {
-          cutOffArray.push(oneItem);
-        }
+        totalScore = totalScore + oneTopic.score;
+        //
       }
-      if (cutOffArray.length === 0) {
-        emptyArray.push(allUsers[i]);
+      let avgScore = totalScore / element.length;
+      // console.log(avgScore);
+      let oneFinalObj = { avgScore: avgScore, name: allUsers[i].name };
+      //
+      emptyArray.push(oneFinalObj);
+    }
+    //
+    let currAvg = 0;
+    let currName;
+    // now sort the array
+    for (let k = 0; k < emptyArray.length; k++) {
+      const onePro = emptyArray[k].avgScore;
+      // console.log(onePro.avgScore);
+      if (currAvg < onePro) {
+        currAvg = onePro;
+        currName = emptyArray[k].name;
       }
     }
+    console.log(currName, currAvg);
 
-    res.send(emptyArray);
+    res.send();
   } catch (error) {
     res.status(500).send(error);
   }
 });
-//Find all the persons who have not scored less than 50 in any subject.
-//foreach method
+//print out the average score of each person in the array.
+//foreach loop
 router.get("/try6", async (req, res) => {
   try {
     const allUsers = await User.find({});
     //
     let emptyArray = [];
-    //
     allUsers.forEach(function (oneObj) {
       let gradesArray = oneObj.grades;
-      //
-      let cutOff = 0;
-      //
-      gradesArray.forEach(function (oneItem) {
-        //
-        if (oneItem.score < 46) {
-          cutOff = cutOff + 1;
-        }
+      let totalScore = 0;
+      gradesArray.forEach(function (oneTopic) {
+        totalScore = totalScore + oneTopic.score;
       });
-      if (cutOff === 0) {
-        emptyArray.push(oneObj);
-      }
+      let avgScore = totalScore / gradesArray.length;
+      // console.log(avgScore);
+      let finalObj = { name: oneObj.name, avgScore: avgScore };
+      emptyArray.push(finalObj);
     });
-
-    res.send(emptyArray);
+    //sort emptyArray
+    let output = emptyArray.sort(function (a, b) {
+      return b.avgScore - a.avgScore;
+    });
+    // console.log(output);
+    res.send(output);
   } catch (error) {
     res.status(500).send(error);
   }
