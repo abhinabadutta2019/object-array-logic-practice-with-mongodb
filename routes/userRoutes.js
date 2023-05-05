@@ -12,217 +12,54 @@ router.get("/all", async (req, res) => {
     res.status(500).send(error);
   }
 });
-//Find all the persons who have an odd age and have scored less than 70 in all subjects.
-//filter related
-//solved with filter + reduce
+//
+
+// sudhu 2 to subject e 20 er kom -
+//with filter method
 router.get("/try1", async (req, res) => {
   try {
     const allUsers = await User.find({});
-    //
-    let filteredArray = allUsers.filter(function (oneObj) {
-      //
+    let outerFilter = allUsers.filter(function (oneObj) {
       let gradesArray = oneObj.grades;
       //
-      let innerFilter = gradesArray.reduce(function (
-        accumulator,
-        currentValue
-      ) {
-        return accumulator + currentValue.score;
-      },
-      0);
-      //
-      // console.log(innerFilter, "innerFilter");
-      //
-      return innerFilter < 150 && oneObj.age % 2 == 0;
+      let innerArray = gradesArray.filter(function (oneTopic) {
+        if (oneTopic.score < 5) {
+          return true;
+        }
+      });
+      // console.log(innerArray, "innerArray");
+      // console.log(innerArray.length);
+      return innerArray.length === 2;
     });
-    //
-    res.send(filteredArray);
+
+    res.send(outerFilter);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-//
 
-//Find all the persons who have an odd age and have scored less than 70 in all subjects.
+// sudhu 0 theke 2 to subject e 20 er kom -
 //with for loop
-router.get("/try3", async (req, res) => {
+
+router.get("/try2", async (req, res) => {
   try {
     const allUsers = await User.find({});
     //
     let emptyArray = [];
-    for (let index = 0; index < allUsers.length; index++) {
-      const element = allUsers[index].grades;
-      //
-      let totalScore = 0;
-      for (let index = 0; index < element.length; index++) {
-        const oneGradeArray = element[index];
-        totalScore = totalScore + oneGradeArray.score;
-      }
-      if (totalScore < 150 && allUsers[index].age % 2 == 0) {
-        emptyArray.push(allUsers[index]);
-      }
-    }
-
-    res.send(emptyArray);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-//Find all the persons who have an odd age and have scored less than 70 in all subjects.
-// forEach loop
-router.get("/try4", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
     //
-    let emptyArray = [];
-    allUsers.forEach(function (oneObj) {
-      let gradesArray = oneObj.grades;
+    for (let i = 0; i < allUsers.length; i++) {
+      let element = allUsers[i].grades;
       //
-      let totalScore = 0;
-      //
-      gradesArray.forEach(function (oneTopic) {
-        totalScore = totalScore + oneTopic.score;
-      });
-      if (totalScore < 150 && oneObj.age % 2 == 0) {
-        emptyArray.push(oneObj);
-      }
-    });
-
-    res.send(emptyArray);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-//Find all the persons who have scored less than 30 in "Subject 1" and have not scored less than 80 in "Subject 4"
-router.get("/try5", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    let filterArray = allUsers.filter(function (eachObj) {
-      let gradesArray = eachObj.grades;
-      //
-      let innerFilter = gradesArray.filter(function (eachTopic) {
-        if (eachTopic.subject === "Subject 1" && eachTopic.score < 30) {
-          return true;
-        }
-      });
-      // console.log(innerFilter);
-      //
-      let twoFilterArray = gradesArray.filter(function (oneSub) {
-        if (oneSub.subject === "Subject 4" && oneSub.score > 80) {
-          return true;
-        }
-      });
-      return innerFilter.length > 0 && twoFilterArray.length > 0;
-    });
-    res.send(filterArray);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-//Find all the persons who have scored less than 30 in "Subject 1" and have not scored less than 80 in "Subject 4"
-//for loop
-//onnekta brute force e hoyeche -- niche -- easier solve ache
-router.get("/try6", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    //
-    let subject1Array = [];
-    for (let index = 0; index < allUsers.length; index++) {
-      let element = allUsers[index].grades;
-      //
+      let filterLessThan = [];
       //
       for (let j = 0; j < element.length; j++) {
-        let oneTopic = element[j];
+        let oneItem = element[j];
         //
-        if (oneTopic.subject === "Subject 1" && oneTopic.score < 30) {
-          subject1Array.push(allUsers[index]);
+        if (oneItem.score < 7) {
+          filterLessThan.push(oneItem);
         }
       }
-      // console.log(subject1Array);
-    }
-    let finalArray = [];
-    //
-    for (let p = 0; p < subject1Array.length; p++) {
-      let secondElement = subject1Array[p].grades;
-      //
-      for (let k = 0; k < secondElement.length; k++) {
-        let oneBranch = secondElement[k];
-        //
-        if (oneBranch.subject === "Subject 4" && oneBranch.score > 80) {
-          finalArray.push(subject1Array[p]);
-        }
-      }
-    }
-    res.send(finalArray);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-//solved by gpt
-router.get("/try61", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    let result = [];
-    // loop through each user
-    for (let i = 0; i < allUsers.length; i++) {
-      let user = allUsers[i];
-      let grades = user.grades;
-      let subject1Score = null;
-      let subject4Score = null;
-      // loop through each grade of the user
-      for (let j = 0; j < grades.length; j++) {
-        let grade = grades[j];
-        if (grade.subject === "Subject 1") {
-          subject1Score = grade.score;
-        }
-        if (grade.subject === "Subject 4") {
-          subject4Score = grade.score;
-        }
-      }
-      // check if user satisfies the conditions
-      if (
-        subject1Score !== null &&
-        subject1Score < 30 &&
-        subject4Score !== null &&
-        subject4Score >= 80
-      ) {
-        result.push(user);
-      }
-    }
-    res.send(result);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-//
-////Find all the persons who have scored less than 30 in "Subject 1" and have not scored less than 80 in "Subject 4"
-//for loop
-router.get("/try7", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    //
-    let emptyArray = [];
-    //
-    for (let i = 0; i < allUsers.length; i++) {
-      // let oneObj = array[i];
-      let oneGradeArray = allUsers[i].grades;
-      let subject1Score = -1;
-      let subject4Score = -1;
-      //
-      for (let j = 0; j < oneGradeArray.length; j++) {
-        const oneTopic = oneGradeArray[j];
-        //
-        if (oneTopic.subject === "Subject 1" && oneTopic.score < 30) {
-          subject1Score = oneTopic.score;
-        }
-        //
-        if (oneTopic.subject === "Subject 4" && oneTopic.score > 80) {
-          subject4Score = oneTopic.score;
-        }
-      }
-      //
-      if (subject1Score > -1 && subject4Score > -1) {
-        //
+      if (filterLessThan.length > 0 && filterLessThan.length < 3) {
         emptyArray.push(allUsers[i]);
       }
     }
@@ -232,47 +69,110 @@ router.get("/try7", async (req, res) => {
     res.status(500).send(error);
   }
 });
-//Find all the persons who have scored less than 30 in "Subject 1" and have not scored less than 80 in "Subject 4"
-//forEach loop
-router.get("/try8", async (req, res) => {
+// sudhu 2 to subject e 20 er kom -
+//forEach method
+router.get("/try3", async (req, res) => {
   try {
     const allUsers = await User.find({});
-
-    let emptyArray = [];
     //
+    let emptyArray = [];
     allUsers.forEach(function (oneObj) {
       let gradesArray = oneObj.grades;
-      let subject1Score = -1;
-      let subject4Score = -1;
       //
+      let lessThanCutOff = 0;
       gradesArray.forEach(function (oneTopic) {
-        if (oneTopic.subject === "Subject 1" && oneTopic.score < 30) {
-          subject1Score = oneTopic.score;
-        }
         //
-        if (oneTopic.subject === "Subject 4" && oneTopic.score > 80) {
-          subject4Score = oneTopic.score;
-          // console.log(subject4Score);
+        if (oneTopic.score < 6) {
+          lessThanCutOff = lessThanCutOff + 1;
         }
       });
-      // console.log(subject1Score);
-      //
-      if (subject1Score > -1 && subject4Score > -1) {
-        // console.log(oneObj);
+      if (lessThanCutOff === 2) {
         emptyArray.push(oneObj);
       }
     });
+
     res.send(emptyArray);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-//
-router.get("/try9", async (req, res) => {
+//Find all the persons who have not scored less than 50 in any subject.
+//filter method
+router.get("/try4", async (req, res) => {
   try {
     const allUsers = await User.find({});
+    let outerFilter = allUsers.filter(function (oneObj) {
+      let gradesArray = oneObj.grades;
+      //
 
-    res.send();
+      let innerArray = gradesArray.filter(function (oneItem) {
+        if (oneItem.score < 50) {
+          return true;
+        }
+      });
+      // console.log(innerArray.length);
+      if (innerArray.length === 0) {
+        return true;
+      }
+    });
+    res.send(outerFilter);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+//Find all the persons who have not scored less than 50 in any subject.
+//forloop method
+router.get("/try5", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    let emptyArray = [];
+    for (let i = 0; i < allUsers.length; i++) {
+      const element = allUsers[i].grades;
+      //
+      let cutOffArray = [];
+      //
+      for (let j = 0; j < element.length; j++) {
+        const oneItem = element[j];
+        //
+        if (oneItem.score < 46) {
+          cutOffArray.push(oneItem);
+        }
+      }
+      if (cutOffArray.length === 0) {
+        emptyArray.push(allUsers[i]);
+      }
+    }
+
+    res.send(emptyArray);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+//Find all the persons who have not scored less than 50 in any subject.
+//foreach method
+router.get("/try6", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    //
+    let emptyArray = [];
+    //
+    allUsers.forEach(function (oneObj) {
+      let gradesArray = oneObj.grades;
+      //
+      let cutOff = 0;
+      //
+      gradesArray.forEach(function (oneItem) {
+        //
+        if (oneItem.score < 46) {
+          cutOff = cutOff + 1;
+        }
+      });
+      if (cutOff === 0) {
+        emptyArray.push(oneObj);
+      }
+    });
+
+    res.send(emptyArray);
   } catch (error) {
     res.status(500).send(error);
   }
