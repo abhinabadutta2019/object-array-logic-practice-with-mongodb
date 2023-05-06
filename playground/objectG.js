@@ -1,3 +1,8 @@
+//Here explanation -how to set-key in a object
+//later solve in -/objectGroupping.js
+
+//kutti asked --- below one question to solve and some logical syntax to understand
+
 let data = [
   { name: "Person 1", age: 35 },
   { name: "Person 2", age: 36 },
@@ -13,6 +18,14 @@ data2 = [
   { name: "Person 4", age: 37, salary: 4000 },
   { name: "Person 5", age: 36, salary: 3000 },
 ];
+
+////////////////////////////
+//kutti asked to check syntax
+console.log(output["age"] != null, "3");
+console.log(output["age"] != undefined, "4");
+
+console.log(!output["age"], "5");
+console.log(!output["age"] === true, "6");
 
 //data 2 another question expected output
 // output = [35: {name:person1, age:35}, 36: {}, 37:{}]
@@ -46,10 +59,3 @@ console.log(output["age"] != null, "2");
 // if (output["age"] == true) {
 //   console.log("Hi");
 // }
-////////////////////////////
-//kutti check syntax
-console.log(output["age"] != null, "3");
-console.log(output["age"] != undefined, "4");
-
-console.log(!output["age"], "5");
-console.log(!output["age"] === true, "6");

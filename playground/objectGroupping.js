@@ -1,3 +1,7 @@
+//Earlier explanation -how to set-key in a object- /objectG.js
+//
+//Here solve
+
 data = [
   { name: "Person 1", age: 35 },
   { name: "Person 2", age: 36 },
