@@ -12,97 +12,217 @@ router.get("/all", async (req, res) => {
     res.status(500).send(error);
   }
 });
-//javascript | Object grouping,with reduce
-//dont understand
-//collected form stack overflow
+//Grouping Objects by city
+//using for loop
 router.get("/try1", async (req, res) => {
   try {
     const allUsers = await User.find({});
-    //
-    const ageGroups = allUsers.reduce(function (accumulator, currentValue) {
-      //
-      const age = currentValue.age;
-      //
-      if (!accumulator[age]) {
-        //
-        // console.log(accumulator, "accumulator");
-        accumulator[age] = [];
-      }
-      //
-      accumulator[age].push(currentValue);
-      console.log(accumulator[age], "accumulator");
-      return accumulator;
-    }, {});
 
     //
-    res.send(ageGroups);
+    let outputObject = {};
+
+    for (let index = 0; index < allUsers.length; index++) {
+      const thatCity = allUsers[index].address.city;
+      // console.log(thatCity, "thatCity");
+      if (!outputObject[thatCity]) {
+        outputObject[thatCity] = [allUsers[index]];
+      } else {
+        outputObject[thatCity].push(allUsers[index]);
+      }
+    }
+
+    res.send(outputObject);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-//javascript | Object grouping,with reduce
-// not working
-//collected form stack overflow
+//Grouping Objects by city
+//variable e na dhukiye -- boro syntax ta likjhlam
 router.get("/try2", async (req, res) => {
   try {
     const allUsers = await User.find({});
+
     //
-    function groupBy(collection, property) {
-      let i = 0,
-        val,
-        index,
-        values = [],
-        result = [];
-      for (; i < collection.length; i++) {
-        val = collection[i][property];
-        index = values.indexOf(val);
-        if (index > -1) {
-          result[index].push(collection[i]);
-        } else {
-          // values.push(val);
-          result[val] = [];
-          result[val].push([collection[i]]);
-        }
+    let outputObject = {};
+
+    for (let index = 0; index < allUsers.length; index++) {
+      // const thatCity = allUsers[index].address.city;
+      // console.log(thatCity, "thatCity");
+      if (!outputObject[allUsers[index].address.city]) {
+        outputObject[allUsers[index].address.city] = [allUsers[index]];
+      } else {
+        outputObject[allUsers[index].address.city].push(allUsers[index]);
       }
-      return result;
     }
 
-    let obj = groupBy(allUsers, "age");
-    res.send(obj);
+    res.send(outputObject);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-
-//javascript | Object grouping,with foreach
-//
-router.get("/try4", async (req, res) => {
+//Grouping Objects by city
+//foreach loop
+router.get("/try3", async (req, res) => {
   try {
     const allUsers = await User.find({});
     //
-    let group = {};
+    let outputObject = {};
+
     //
-    allUsers.forEach(function (oneObj) {
-      //group object er - key set--[oneObj.age], ekane-23/ 24/31 ..etc
-      let list = group[oneObj.age];
+    allUsers.forEach(function (item) {
       //
-      if (list) {
-        list.push(oneObj);
-      } else {
-        group[oneObj.age] = [oneObj];
+      if (!outputObject[item.address.city]) {
+        outputObject[item.address.city] = [item];
       }
+      //
+      outputObject[item.address.city].push(item);
     });
 
-    res.send(group);
+    res.send(outputObject);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-//
+//Group the objects by their highest score in the grades array.
+router.get("/try4", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    let outputObject = {};
+    for (let index = 0; index < allUsers.length; index++) {
+      const gradesArray = allUsers[index].grades;
+      let highScore = -1;
+      for (let index = 0; index < gradesArray.length; index++) {
+        const scoreOfGrades = gradesArray[index].score;
+        //
+        if (scoreOfGrades > highScore) {
+          highScore = scoreOfGrades;
+        }
+      }
+
+      //
+      if (!outputObject[highScore]) {
+        outputObject[highScore] = [allUsers[index]];
+      }
+      outputObject[highScore].push(allUsers[index]);
+    }
+    console.log(outputObject);
+    res.send(outputObject);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+//Group the objects by their highest score in the grades array.
+//foreach
 router.get("/try5", async (req, res) => {
   try {
     const allUsers = await User.find({});
     //
+    let emptyObject = {};
+    allUsers.forEach(function (oneObj) {
+      const gradesArray = oneObj.grades;
+      let highScore = -1;
+      gradesArray.forEach(function (oneItem) {
+        if (highScore < oneItem.score) {
+          highScore = oneItem.score;
+        }
+      });
+      //
+      if (!emptyObject[highScore]) {
+        emptyObject[highScore] = [oneObj];
+      }
+      emptyObject[highScore].push(oneObj);
+    });
+
+    //
+    res.send(emptyObject);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+//each subject er highest score -- er group
+//for loop- working
+router.get("/try6", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    let emptyObject = {};
+    for (let index = 0; index < allUsers.length; index++) {
+      const gradesArray = allUsers[index].grades;
+      //
+      for (let index = 0; index < gradesArray.length; index++) {
+        const oneGradeTopic = gradesArray[index];
+        if (!emptyObject[oneGradeTopic.subject]) {
+          emptyObject[oneGradeTopic.subject] = oneGradeTopic.score;
+          // emptyObject[oneGradeTopic.subject] = allUsers[index];
+        }
+        // console.log(oneGradeTopic.score, "oneGradeTopic.score");
+        // console.log(
+        //   emptyObject[oneGradeTopic.subject],
+        //   "emptyObject[oneGradeTopic.subject]"
+        // );
+        if (
+          emptyObject[oneGradeTopic.subject] &&
+          oneGradeTopic.score > emptyObject[oneGradeTopic.subject]
+        ) {
+          emptyObject[oneGradeTopic.subject] = oneGradeTopic.score;
+          // console.log(emptyObject[oneGradeTopic.subject]);
+        }
+      }
+    }
+
+    res.send(emptyObject);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+//age diye - group practice
+//with for loop
+router.get("/try7", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    let emptyObject = {};
+    for (let index = 0; index < allUsers.length; index++) {
+      const element = allUsers[index];
+      if (!emptyObject[element.age]) {
+        emptyObject[element.age] = allUsers[index];
+      }
+    }
+    res.send(emptyObject);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+//group by each subject and highest scorer
+//done by gpt
+router.get("/try9", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    const output = {};
+    //
+    allUsers.forEach((item) => {
+      item.grades.forEach((grade) => {
+        if (
+          !output[grade.subject] ||
+          output[grade.subject].score < grade.score
+        ) {
+          output[grade.subject] = {
+            subject: grade.subject,
+            score: grade.score,
+            highestScorer: item.name,
+          };
+        }
+      });
+    });
+
+    res.send(output);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+//
+router.get("/try10", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
 
     res.send();
   } catch (error) {
@@ -110,7 +230,16 @@ router.get("/try5", async (req, res) => {
   }
 });
 //
-///////////////////////////////////////////////////////////////////////////////////////////////
+router.get("/try11", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+
+    res.send();
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+/////////////////////////////////////////////////////////////////////////////////////////////
 //aggregate
 //////////////////////////////
 
