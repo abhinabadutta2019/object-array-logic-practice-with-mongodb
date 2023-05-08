@@ -13,167 +13,98 @@ router.get("/all", async (req, res) => {
   }
 });
 
-//group by each subject and highest scorer
-//done by gpt
-router.get("/try9", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    const output = {};
-    //
-    allUsers.forEach((item) => {
-      item.grades.forEach((grade) => {
-        if (
-          !output[grade.subject] ||
-          output[grade.subject].score < grade.score
-        ) {
-          output[grade.subject] = {
-            subject: grade.subject,
-            score: grade.score,
-            highestScorer: item.name,
-          };
-        }
-      });
-    });
-
-    res.send(output);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-//expected output
-//group by each subject and highest scorer
-//{
-//   "Subject 1": {
-//     "subject": "Subject 1",
-//     "score": 99,
-//     "highestScorer": "Person 94"
-// },
-// "Subject 2": {
-//     "subject": "Subject 2",
-//     "score": 100,
-//     "highestScorer": "Person 27"
-// },
-// }
-//
-//
-router.get("/try10", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    let outputObject = {};
-    //
-    for (let index = 0; index < allUsers.length; index++) {
-      const gradesArray = allUsers[index].grades;
-      //
-      for (let index = 0; index < gradesArray.length; index++) {
-        const oneTopic = gradesArray[index];
-        //
-        if (!outputObject[oneTopic.subject]) {
-          outputObject[oneTopic.subject] = {
-            subject: oneTopic.subject,
-            score: oneTopic.score,
-            highScorer: allUsers[index].name,
-          };
-        }
-        //
-        // console.log(oneTopic.score, "current loop er score");
-        // console.log(
-        //   outputObject[oneTopic.subject].subject,
-        //   "output object er key"
-        // );
-        // console.log(oneTopic.subject, "current loop er subject");
-        //
-        // if (outputObject[oneTopic.subject]) {
-        //   console.log(outputObject[oneTopic.subject].score);
-        // }
-        //
-        if (
-          outputObject[oneTopic.subject].subject === oneTopic.subject &&
-          outputObject[oneTopic.subject].score < oneTopic.score
-        ) {
-          outputObject[oneTopic.subject].score = oneTopic.score;
-          outputObject[oneTopic.subject].name = allUsers[index].name;
-        }
-      }
-    }
-    res.send(outputObject);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-//try 9 er chat gpt er logic ta better logic
-//
-router.get("/try11", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    let outputObject = {};
-    //
-    allUsers.forEach(function (oneObj) {
-      let gradesArray = oneObj.grades;
-      //
-      gradesArray.forEach(function (oneTopic) {
-        if (!outputObject[oneTopic.subject]) {
-          outputObject[oneTopic.subject] = {
-            subject: oneTopic.subject,
-            score: oneTopic.score,
-            highScorer: oneObj.name,
-          };
-        }
-        //
-        if (
-          outputObject[oneTopic.subject].subject === oneTopic.subject &&
-          oneTopic.score > outputObject[oneTopic.subject].score
-        ) {
-          outputObject[oneTopic.subject].score = oneTopic.score;
-          outputObject[oneTopic.subject].highScorer = oneObj.name;
-        }
-      });
-    });
-    //
-    res.send(outputObject);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-//
+//break foreach loop( some)
 router.get("/try12", async (req, res) => {
   try {
     const allUsers = await User.find({});
-
-    res.send();
+    //
+    let outputArray = [];
+    allUsers.some(function (oneObj) {
+      outputArray.push(oneObj.name);
+      return true;
+    });
+    res.send(outputArray);
   } catch (error) {
     res.status(500).send(error);
   }
 });
 //
+//break foreach( every method)
+router.get("/try157", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    //
+    let outputArray = [];
+    allUsers.every(function (oneObj, index) {
+      outputArray.push(oneObj.name);
+      return index !== 0; // Break after second iteration
+    });
+    res.send(outputArray);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+//break foreach loop( after second itaration)
+router.get("/try155", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    //
+    let outputArray = [];
+    let iteration = 0;
+    allUsers.forEach(function (oneObj) {
+      //after second itaration
+      if (iteration === 2) {
+        return;
+      }
+      outputArray.push(oneObj.name);
+      iteration++;
+    });
+    res.send(outputArray);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+//break for loop- inside-route
 router.get("/try13", async (req, res) => {
   try {
     const allUsers = await User.find({});
-
-    res.send();
+    //
+    let outputArray = [];
+    for (let index = 0; index < allUsers.length; index++) {
+      const oneObj = allUsers[index];
+      outputArray.push(oneObj.name);
+      break;
+    }
+    res.send(outputArray);
   } catch (error) {
     res.status(500).send(error);
   }
 });
-//
+//break for loop,, after second iteration
 router.get("/try14", async (req, res) => {
   try {
     const allUsers = await User.find({});
+    let outputArray = [];
+    for (let index = 0; index < allUsers.length; index++) {
+      const oneObj = allUsers[index];
+      outputArray.push(oneObj.name);
+      //
+      if (index >= 1) {
+        break; // break after second iteration
+      }
+    }
 
-    res.send();
+    res.send(outputArray);
   } catch (error) {
     res.status(500).send(error);
   }
 });
 //
-router.get("/try15", async (req, res) => {
-  try {
-    const allUsers = await User.find({});
 
-    res.send();
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+//
+
 //
 router.get("/try16", async (req, res) => {
   try {
