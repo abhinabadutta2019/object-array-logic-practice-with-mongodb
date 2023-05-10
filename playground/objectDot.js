@@ -1,50 +1,68 @@
 //////////////////////////////////////////////////
-////use 3rd bracket syntax
+////eta correct precess noi-- dubar if block -- wrong-
 //////////////////////////////////////////////////
+// let arr = ["A", "A", "B", "C", "C", "A", "A"];
+
+// let outputObject = {};
+
+// for (let i = 0; i < arr.length; i++) {
+//   //   const arr[i] = arr[i];
+//   if (!outputObject[arr[i]]) {
+//     outputObject[arr[i]] = 1; //etai right side e '1' er jagai '0' rakhle -- porer if block e dhukche na ( as 0= false)
+//     //aar eta 1 korle --1ta kore extra count asche
+//     //{ A: 5, B: 2, C: 3 } outputObject--- answer asche--( not correct)
+//     //{ A: 4, B: 1, C: 2 } asbar kotha
+//   }
+//   // console.log(outputObject[arr[i]]);
+
+//   // outputObject[arr[i]] + 1;// this syntax not working
+//   //
+//   if (outputObject[arr[i]]) {
+//     // console.log("Hi");
+//     // console.log(outputObject[arr[i]], "outputObject[arr[i]]");
+//     outputObject[arr[i]] = outputObject[arr[i]] + 1; //
+//   }
+//   // console.log(arr[i]);
+// }
+
+// console.log(outputObject, "outputObject");
+////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+// let myArr = ["A", "A", "B", "C", "C", "A", "A"];
+
+// let myOutput = {};
+
+// //
+// for (let j = 0; j < myArr.length; j++) {
+//   // console.log(myArr[j], "myArr[j]");
+//   if (!myOutput[myArr[j]]) {
+//     myOutput[myArr[j]] = { counter: 0 };
+//   }
+//   //
+//   if (myOutput[myArr[j]]) {
+//     myOutput[myArr[j]].counter = myOutput[myArr[j]].counter + 1;
+//   }
+// }
+// //
+// console.log(myOutput, "myOutput"); //{ A: { counter: 4 }, B: { counter: 1 }, C: { counter: 2 } } myOutput
+///////////////////////////////////////////////////////////////////////////////
+//solved by kutti
+/////////////////////////////////////////////////////////
 let arr = ["A", "A", "B", "C", "C", "A", "A"];
 
 let outputObject = {};
 
 for (let i = 0; i < arr.length; i++) {
-  //   const arr[i] = arr[i];
-  if (!outputObject[arr[i]]) {
-    outputObject[arr[i]] = [arr[i]];
+  const element = arr[i];
+  //
+  if (!outputObject[element]) {
+    outputObject[element] = 1;
+    // console.log(i, "i value");
+  } else if (outputObject[element]) {
+    outputObject[element] = outputObject[element] + 1;
+    // console.log(i, "block 2 -i value");
   }
   //
-  if (outputObject[arr[i]]) {
-    outputObject[arr[i]].push(arr[i]);
-  }
 }
-
-console.log(outputObject);
-//
-//loop through object
-// for (const key of Object.keys(outputObject)) {
-//   //   console.log(outputObject[key]);
-//   outputObject[key] = outputObject[key].length;
-// }
-// // console.log(outputObject); //{ A: 4, B: 1, C: 2 }
-////////////////////////////////////////////////////////////////////
-///////////use dot syntax
-//////////////////////////////////////////////////////////////////////
-// let arr = ["A", "A", "B", "C", "C", "A", "A"];
-
-// let outputObject = {};
-
-// for (let j = 0; j < arr.length; j++) {
-//   //   array[j];
-//   //dot syntax not working-- jokhon initializing value
-//   //   if (!outputObject.arr[j]) {
-//   //     // outputObject.arr[j] = []; //ReferenceError: Cannot access 'outputObject' before initialization
-//   //   }
-//   //
-//   //
-//   if (!outputObject[arr[j]]) {
-//     outputObject[arr[j]] = [];
-//   }
-//   //
-//   if (outputObject[arr[j]]) {
-//     outputObject[arr[j]].push(arr[j]);
-//   }
-// }
-// console.log(outputObject, "outputObject");
+console.log(outputObject, "outputObject");
