@@ -1,3 +1,23 @@
+//solved by kutti
+/////////////////////////////////////////////////////////
+let arr = ["A", "A", "B", "C", "C", "A", "A"];
+
+let outputObject = {};
+
+for (let i = 0; i < arr.length; i++) {
+  const element = arr[i];
+  //
+  if (!outputObject[element]) {
+    outputObject[element] = 1;
+    // console.log(i, "i value");
+  } else if (outputObject[element]) {
+    outputObject[element] = outputObject[element] + 1;
+    // console.log(i, "block 2 -i value");
+  }
+  //
+}
+console.log(outputObject, "outputObject");
+
 //////////////////////////////////////////////////
 ////eta correct precess noi-- dubar if block -- wrong-
 //////////////////////////////////////////////////
@@ -47,22 +67,3 @@
 // //
 // console.log(myOutput, "myOutput"); //{ A: { counter: 4 }, B: { counter: 1 }, C: { counter: 2 } } myOutput
 ///////////////////////////////////////////////////////////////////////////////
-//solved by kutti
-/////////////////////////////////////////////////////////
-let arr = ["A", "A", "B", "C", "C", "A", "A"];
-
-let outputObject = {};
-
-for (let i = 0; i < arr.length; i++) {
-  const element = arr[i];
-  //
-  if (!outputObject[element]) {
-    outputObject[element] = 1;
-    // console.log(i, "i value");
-  } else if (outputObject[element]) {
-    outputObject[element] = outputObject[element] + 1;
-    // console.log(i, "block 2 -i value");
-  }
-  //
-}
-console.log(outputObject, "outputObject");
